@@ -162,17 +162,17 @@ comme un trinket qu'on ne peut ni perdre ni remplacer. Code : `hero.HeroRegistry
 | Personnage | PV | Capacité | Effet |
 |---|---|---|---|
 | **Louis** | 100 | MAN | +50 % de dégâts, tout le temps (tous éléments, additionné aux autres pourcentages, comme CMS). Aucun malus. |
-| **Dave** | 100 | Full skill Mr. Le Juge | Un sort du même élément que le terrain **et** qui bat l'élément de l'adversaire (ex. Boule de feu à l'EPFL contre un adversaire plante) soigne des PV enlevés à l'adversaire. |
+| **Dave** | 100 | Full skill Mr. Le Juge | Un sort du même élément que le terrain (ex. Boule de feu à l'EPFL) soigne des PV enlevés à l'adversaire. |
 | **Sassy** | 130 | wadayatalkinabit | À chaque début de tour, son alien inflige 4 dégâts bruts à l'adversaire, en plus de l'action du joueur. 10 % de chance que l'alien rate son tour et fume un joint à la place (aucun effet, pour le lore). L'alien est un **familier** de 20 PV (voir ci-dessous). |
 | **Frederic BLC** | 100 | Aucune | Aucune compétence, mais des stats « parfaitement moyennes » : 2 partout (12 points au lieu de 8). |
 
-**Stats de base** (8 points selon la capacité, 12 pour Frederic BLC) :
+**Stats de base** (8 points pour Louis, 9 pour Dave et Sassy, 12 pour Frederic BLC) :
 
 | Personnage | FOR | INT | ESP | DEF | RES | CHA | Logique |
 |---|---|---|---|---|---|---|---|
 | Louis | 3 | 2 | 0 | 1 | 1 | 1 | MAN : profil offensif |
-| Dave | 1 | 3 | 1 | 1 | 1 | 1 | INT pour les statuts et les sorts algébriques/géométriques |
-| Sassy | 1 | 0 | 2 | 2 | 2 | 1 | Déjà 130 PV et l'alien : profil endurant |
+| Dave | 2 | 3 | 1 | 1 | 1 | 1 | INT pour les statuts et les sorts algébriques/géométriques |
+| Sassy | 2 | 0 | 2 | 2 | 2 | 1 | Déjà 130 PV et l'alien : profil endurant |
 | Frederic BLC | 2 | 2 | 2 | 2 | 2 | 2 | Aucune capacité : le perso des builds de stats |
 
 **L'alien de Sassy (familier)** — code : `model.Familiar` (générique : un trinket ou un objet pourra plus tard
@@ -297,8 +297,8 @@ La couleur de rareté est la même partout : texte en terminal ; dans la fenêtr
 | Légendaire | jaune | 1 | 200 |
 | Secret | magenta | seulement une fois débloqué (poids 1), voir `docs/SECRETS.md` | — |
 
-Les **cartes proposées** (récompenses de carte, shop, George) sont tirées avec les mêmes poids de rareté que les
-objets (× les poids des trinkets, Grinder…) ; elles étaient tirées uniformément, ce qui proposait une Légendaire
+Les **cartes proposées** (récompenses de carte, shop, George) sont tirées selon leur rareté, avec leurs propres
+poids : Commun 40, Peu commun 30, Rare 20, Légendaire 3 (× les poids des trinkets, Grinder…) ; elles étaient tirées uniformément, ce qui proposait une Légendaire
 plusieurs fois par partie. Mesure (`./gradlew balanceRun`, 800 parties du bot) : 3,3 → 0,23 Légendaire proposée
 par partie. La pioche des parties sans deck (tests) reste uniforme.
 

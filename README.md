@@ -74,8 +74,8 @@ icônes, carte (voir « Interface de la fenêtre »).
 
 - Écran titre : **Jouer**, **Règles**, **Options**, **Quitter** (↑/↓ ou ←/→, Entrée ; R et Q en raccourci).
 - Puis le **choix du personnage** (←/→ ou 1-3, Entrée ; Échap revient au titre) : **Louis** (MAN : premier
-  sort de chaque combat +50 %, Gueule de bois doublée), **Dave** (Full skill Mr. Le Juge : un sort du
-  terrain qui bat l'adversaire le soigne des PV enlevés), **Sassy** (wadayatalkinabit : 130 PV, un alien
+  sort de chaque combat +50 %, Gueule de bois doublée), **Dave** (Full skill Mr. Le Juge : un sort de
+  l'élément du terrain le soigne des PV enlevés), **Sassy** (wadayatalkinabit : 130 PV, un alien
   inflige 4 dégâts à chaque tour, sauf quand il fume un joint).
 - En jeu, **Échap** ouvre le menu **pause** (Reprendre, Options, Quitter la partie) sur la carte, en combat, à la
   Sieste, dans un événement et sur les écrans de récompense. Dans un sous-écran (remplacer un objet,
