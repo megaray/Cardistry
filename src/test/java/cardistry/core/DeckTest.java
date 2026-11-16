@@ -155,8 +155,11 @@ class DeckTest {
         GameState game = GameState.newGame();
         SpellCard common = new SpellCard("Commune", FIRE, 1, cardistry.items.Rarity.COMMON);
         SpellCard legendary = new SpellCard("Légendaire", FIRE, 1, cardistry.items.Rarity.LEGENDARY);
-        assertEquals(60, CombatEngine.offerWeight(game, common), 1e-9);
-        assertEquals(1, CombatEngine.offerWeight(game, legendary), 1e-9);
+        assertEquals(40, CombatEngine.offerWeight(game, common), 1e-9);
+        assertEquals(3, CombatEngine.offerWeight(game, legendary), 1e-9);
+        assertEquals(java.util.List.of(40, 30, 20, 3), java.util.stream.Stream.of(cardistry.items.Rarity.COMMON,
+                cardistry.items.Rarity.UNCOMMON, cardistry.items.Rarity.RARE, cardistry.items.Rarity.LEGENDARY)
+                .map(cardistry.items.Rarity::cardWeight).toList(), "poids des cartes par rareté");
         CardPool pool = new CardPool(List.of(common, legendary));
         Rng rng = new Rng(3);
         int legendaries = 0;
@@ -165,7 +168,7 @@ class DeckTest {
             legendaries += pool.draw(rng, c -> CombatEngine.offerWeight(game, c)).rarity()
                     == cardistry.items.Rarity.LEGENDARY ? 1 : 0;
         }
-        assertEquals(1.0 / 61, (double) legendaries / trials, 0.004);
+        assertEquals(3.0 / 43, (double) legendaries / trials, 0.004);
     }
 
     @Test

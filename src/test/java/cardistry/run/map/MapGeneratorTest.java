@@ -149,9 +149,11 @@ class MapGeneratorTest {
         double combat = counts.getOrDefault(NodeType.COMBAT, 0) / (double) total;
         double elite = counts.getOrDefault(NodeType.ELITE, 0) / (double) total;
         double event = counts.getOrDefault(NodeType.EVENT, 0) / (double) total;
-        // Poids 45 / 15 / 22, un peu déformés par les contraintes (pas deux élites de suite…).
-        assertTrue(combat > 0.40 && combat < 0.60, "combat " + combat);
+        double altar = counts.getOrDefault(NodeType.ALTAR, 0) / (double) total;
+        // Poids 45 / 15 / 22 / 22 (autel), un peu déformés par les contraintes (pas deux élites de suite…).
+        assertTrue(combat > 0.32 && combat < 0.50, "combat " + combat);
         assertTrue(elite > 0.08 && elite < 0.18, "élite " + elite);
-        assertTrue(event > 0.17 && event < 0.30, "événement " + event);
+        assertTrue(event > 0.14 && event < 0.26, "événement " + event);
+        assertTrue(altar > 0.10 && altar < 0.22, "autel " + altar);
     }
 }

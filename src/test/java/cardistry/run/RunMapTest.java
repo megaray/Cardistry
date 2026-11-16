@@ -62,6 +62,7 @@ class RunMapTest {
                 case EVENT -> run.chooseStory(run.story().orElseThrow().choices().size() - 1);
                 case REST -> run.rest(RestOption.HEAL);
                 case STAT_POINTS -> run.spendStatPoint(cardistry.core.stats.StatType.STRENGTH);
+                case ALTAR -> run.leaveAltar();
                 case OVER -> {
                 }
             }
@@ -89,6 +90,7 @@ class RunMapTest {
                 case EVENT -> run.chooseStory(run.story().orElseThrow().choices().size() - 1);
                 case REST -> run.rest(RestOption.HEAL);
                 case STAT_POINTS -> run.spendStatPoint(cardistry.core.stats.StatType.STRENGTH);
+                case ALTAR -> run.leaveAltar();
                 case OVER -> {
                 }
             }
@@ -400,6 +402,7 @@ class RunMapTest {
                 case CARD_REWARD -> run.resolveCardReward(-1);
                 case REST -> run.rest(RestOption.HEAL);
                 case STAT_POINTS -> run.spendStatPoint(cardistry.core.stats.StatType.STRENGTH);
+                case ALTAR -> run.leaveAltar();
                 case EVENT -> run.chooseStory(run.story().orElseThrow().choices().size() - 1);
                 case SHOP, OVER -> {
                 }
@@ -436,6 +439,7 @@ class RunMapTest {
                 case MAP -> run.chooseNode(0);
                 case REST -> run.rest(RestOption.HEAL);
                 case STAT_POINTS -> run.spendStatPoint(cardistry.core.stats.StatType.STRENGTH);
+                case ALTAR -> run.leaveAltar();
                 case SHOP -> run.shop(new cardistry.core.shop.ShopAction.Leave());
                 case EVENT -> run.chooseStory(run.story().orElseThrow().choices().size() - 1);
                 default -> throw new AssertionError(run.phase());
@@ -495,6 +499,7 @@ class RunMapTest {
                 case CARD_REWARD -> run.resolveCardReward(-1);
                 case REST -> run.rest(RestOption.HEAL);
                 case STAT_POINTS -> run.spendStatPoint(cardistry.core.stats.StatType.STRENGTH);
+                case ALTAR -> run.leaveAltar();
                 case SHOP -> run.shop(new cardistry.core.shop.ShopAction.Leave());
                 case OVER -> {
                 }
