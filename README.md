@@ -114,8 +114,18 @@ quitte le jeu (les déblocages sont déjà sauvegardés).
 | `--ascii` | ASCII pur (cadres `+-|`, barres `#`, accents retirés) |
 | `--no-color` | mode texte sans couleurs ANSI |
 | `--window` | ancien nom de la fenêtre (c'est le mode par défaut) |
+| `--debug` | journal détaillé (chaque événement du jeu) et console de développement (F12) |
 
 Exemples : `./play --seed 42 --crt`, `./play --terminal`, `play.bat --no-ui --no-color`.
+
+### Journal de débogage
+
+`debug.log` est écrit dans le dossier de sauvegarde (Linux `~/.local/share/cardistry`, macOS
+`~/Library/Application Support/Cardistry`, Windows `%APPDATA%\Cardistry`) ; celui du lancement
+précédent est gardé en `debug.1.log`. Par défaut : démarrage, seed, erreurs et plantages (avec la
+pile) ; avec `--debug` : tous les événements du jeu. Dans le code : `Log.debug / info / warn / error`
+(`cardistry.utils.Log`), le fichier et la ligne de l'appelant sont ajoutés tout seuls. Les tests
+n'écrivent aucun fichier (`-Dcardistry.log=off`).
 
 ## Particularités par OS
 
