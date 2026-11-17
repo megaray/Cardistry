@@ -710,6 +710,11 @@ public final class CombatEngine {
             return true; // déjà traité
         }
         lastKilled = enemy;
+        List<Trinket> returnedStolenTrinkets = state.returnStolenTrinkets();
+        for(Trinket trinketReturned: returnedStolenTrinkets){
+            bus.publish(new GameEvent.TrinketReturned(trinketReturned));
+        }
+        publishSetChanges();
         bus.publish(new GameEvent.EnemyKilled(enemy));
         changeChoomies(choomiesFor(enemy));
         endCombat();
@@ -1023,6 +1028,9 @@ public final class CombatEngine {
         int used = taken instanceof Trinket ? state.trinkets().size() : state.items().size();
         int slots = taken instanceof Trinket ? state.trinketSlots() : state.itemSlots();
         if (replaceSlot < 0) {
+            if (taken instanceof Trinket trinket) {
+                return state.hasRoomFor(trinket) ? null : Reason.INVENTORY_FULL;
+            }
             return used < slots ? null : Reason.INVENTORY_FULL;
         }
         return replaceSlot < used ? null : Reason.INVALID_REWARD;
@@ -1578,6 +1586,21 @@ public final class CombatEngine {
             }
             case MoveEffect.Gamble gamble -> execute(
                     rng.nextDouble() < gamble.chance() ? gamble.onSuccess() : gamble.onFailure(), run);
+
+            case MoveEffect.StealTrinket steal -> {
+                if (attackBlocked(run)) {
+                    return;
+                }
+                if(state.trinkets().isEmpty()) {
+                    strike(MoveEffect.Hit.of(steal.fallbackDamage()), run);
+                    return;
+                }
+                if(rng.nextDouble() >= steal.chance()) {
+                    return;
+                }
+                stealRandomTrinket(run);
+                publishSetChanges();
+            }
             case MoveEffect.Dodge dodge -> {
                 enemy.setDodgeReady(true);
                 bus.publish(new GameEvent.DodgeReady(enemy));
@@ -1616,32 +1639,49 @@ public final class CombatEngine {
                             inflict.turns(), StatusExtras.NONE, StatusTarget.ENEMY, true);
                 }
             }
+
+            case MoveEffect.Drink drink -> {
+                addDrunkenness(drink.amount());
+            }
+
         }
     }
 
-    /** Un coup : annulé (Moscow Mule, une fois pour toute l'attaque), raté, ou subi. */
-    private void strike(MoveEffect.Hit hit, MoveRun run) {
-        Enemy enemy = run.enemy;
+
+    /** Vole un trinket équipé, tiré au hasard, le met de côté et publie TrinketStolen. */
+    private void stealRandomTrinket(MoveRun run) {
+        int slot = rng.nextInt(state.trinkets().size());
+        Trinket stolenTrinket = state.stealTrinket(slot);
+        bus.publish(new GameEvent.TrinketStolen(run.enemy, stolenTrinket));
+    }
+
+
+    /** Annulation d’une attaque : immunité de Fons ou Moscow Mule, vérifiée une fois par attaque */
+    private boolean attackBlocked(MoveRun run) {
         if (!run.shieldChecked) {
             run.shieldChecked = true;
             boolean immune = state.statuses(StatusTarget.PLAYER).get(StatusType.FONS)
                     .map(f -> f.extras().immuneToAttacks()).orElse(false);
             if (immune) {
-                bus.publish(new GameEvent.AttackCancelled(enemy, StatusType.FONS.displayName()));
+                bus.publish(new GameEvent.AttackCancelled(run.enemy, StatusType.FONS.displayName()));
                 run.cancelled = true;
-                return;
+                return true;
             }
             Optional<TemporaryEffect> shield = state.effects().stream()
                     .filter(e -> e.isActive() && e.cancelsEnemyAttack()).findFirst();
             if (shield.isPresent()) {
-                bus.publish(new GameEvent.AttackCancelled(enemy, shield.get().name()));
+                bus.publish(new GameEvent.AttackCancelled(run.enemy, shield.get().name()));
                 consume(shield.get());
                 run.cancelled = true;
             }
         }
-        if (run.cancelled) {
-            return;
-        }
+        return run.cancelled;
+    }
+
+    /** Un coup : annulé (Moscow Mule, une fois pour toute l'attaque), raté, ou subi. */
+    private void strike(MoveEffect.Hit hit, MoveRun run) {
+        Enemy enemy = run.enemy;
+        if(attackBlocked(run)){return;}
         if (hit.missChance() > 0 && rng.nextDouble() < hit.missChance()) {
             double healed = hit.healOnMiss() > 0 ? enemy.healSelf(CombatFormula.heal(hit.healOnMiss() * enemy.damageScale(),
                     enemy.stat(StatType.MIND), 1.0)) : 0;

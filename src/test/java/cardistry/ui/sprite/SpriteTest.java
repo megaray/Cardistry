@@ -84,7 +84,7 @@ class SpriteTest {
     @Test
     void spritesOriginauxAnimes() {
         for (String id : List.of("caddie-enerve", "came", "paresseux", "seau-de-fuite", "vafi", "le-peneu",
-                "t-rex-defonce", "etudiant-post-examen")) {
+                "t-rex-defonce", "etudiant-post-examen", "nortin", "zo")) {
             Sprite sprite = Sprites.byId(id).orElseThrow();
             assertTrue(sprite.idle().size() >= 2 && sprite.idle().size() <= 3, id + " : 2-3 frames idle");
             assertFalse(sprite.frames(Sprite.ATTACK).isEmpty(), id + " : attaque");
@@ -95,23 +95,26 @@ class SpriteTest {
     @Test
     void spritesEnAsciiPurDansLaZoneEtCouleursValides() throws IOException {
         for (Map.Entry<String, Sprite> entry : Sprites.catalog()) {
-            Sprite sprite = entry.getValue();
-            String raw = read(entry.getKey());
-            for (String line : raw.lines().toList()) {
-                if (line.startsWith("@name") || line.startsWith("@#")) {
-                    continue; // le nom peut avoir des accents : il n'est pas dessiné tel quel
-                }
-                assertTrue(line.chars().allMatch(c -> c >= 32 && c < 127), entry.getKey() + " : non ASCII : " + line);
+            assertAsciiInZoneWithValidColors(entry.getKey(), entry.getValue());
+        }
+    }
+
+    private static void assertAsciiInZoneWithValidColors(String id, Sprite sprite) throws IOException {
+        String raw = read(id);
+        for (String line : raw.lines().toList()) {
+            if (line.startsWith("@name") || line.startsWith("@#")) {
+                continue; // le nom peut avoir des accents : il n'est pas dessiné tel quel
             }
-            for (String animation : sprite.animations()) {
-                for (Sprite.Frame frame : sprite.frames(animation)) {
-                    assertTrue(frame.lines().size() <= Sprite.MAX_HEIGHT, entry.getKey() + " trop haut");
-                    assertTrue(frame.width() <= Sprite.MAX_WIDTH, entry.getKey() + " trop large");
-                    if (frame.colors() != null) {
-                        for (String colors : frame.colors()) {
-                            assertTrue(colors.chars().allMatch(c -> COLOR_LETTERS.contains((char) c)),
-                                    entry.getKey() + " : couleur inconnue : " + colors);
-                        }
+            assertTrue(line.chars().allMatch(c -> c >= 32 && c < 127), id + " : non ASCII : " + line);
+        }
+        for (String animation : sprite.animations()) {
+            for (Sprite.Frame frame : sprite.frames(animation)) {
+                assertTrue(frame.lines().size() <= Sprite.MAX_HEIGHT, id + " trop haut");
+                assertTrue(frame.width() <= Sprite.MAX_WIDTH, id + " trop large");
+                if (frame.colors() != null) {
+                    for (String colors : frame.colors()) {
+                        assertTrue(colors.chars().allMatch(c -> COLOR_LETTERS.contains((char) c)),
+                                id + " : couleur inconnue : " + colors);
                     }
                 }
             }

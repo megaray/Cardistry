@@ -1,0 +1,70 @@
+@name Zo le StreMon
+@# Boss du niveau 2 : cheveux ondulés blond foncé, lunettes rondes, yeux bleus, henley blanc, veste en cuir brun ; il parle tout le temps.
+@frame idle
+     ,~~,~~~,~~,
+    (~ ~~ ~ ~~ ~)
+    (~/ ~  ~ \~ )
+    | (o)--(o) |
+    |    db    |
+    |   (__)   |
+     \________/
+   /##|\    /|##\
+  |###| \__/ |###|
+  |###|  ..  |###|
+@colors
+     yYYyYYYyYYy
+    YY YY Y YY YY
+    YYY Y  Y YY Y
+    w kbkkkkbk w
+    w    rr    w
+    w   RRRR   w
+     wwwwwwwwww
+   yyyWW    WWyyy
+  yyyyW WWWW Wyyyy
+  yyyyW  YY  Wyyyy
+
+@frame idle
+     ,~,~~~,~~,~
+    (~~ ~ ~~ ~ ~)
+    (~/ ~  ~ \~ )
+    | (-)--(-) |
+    |    db    |
+    |   (__)   |
+     \________/
+   /##|\    /|##\
+  |###| \__/ |###|
+  |###|  ..  |###|
+@frame attack
+     ,~~,~~~,~~,
+    (~ ~~ ~ ~~ ~)
+    (~/ ~  ~ \~ )
+    | (O)--(O) |
+    |    db    |
+    |   (  )   |
+     \________/
+==/##|\    /|##\
+==###| \__/ |###|
+==###|  ..  |###|
+@colors
+     yYYyYYYyYYy
+    YY YY Y YY YY
+    YYY Y  Y YY Y
+    w kbkkkkbk w
+    w    rr    w
+    w   R  R   w
+     wwwwwwwwww
+WWyyyWW    WWyyy
+WWyyyW WWWW Wyyyy
+WWyyyW  YY  Wyyyy
+
+@frame hurt
+     ,~~,~~~,~~,
+    (~ ~~ ~ ~~ ~)
+    (~/ ~  ~ \~ )
+    | (x)--(x) |
+    |    db    |
+    |   (  )   |
+     \________/
+   /##|\    /|##\
+  |###| \__/ |###|
+  |###|  ..  |###|

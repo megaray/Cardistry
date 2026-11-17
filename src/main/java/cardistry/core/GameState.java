@@ -64,6 +64,8 @@ public final class GameState {
     private int turn = 0;
     private int combatTurn = 0;
     private final List<Trinket> trinkets = new ArrayList<>();
+    /** Liste de trinkets volés pour pouvoirs être rendus*/
+    private final List<Trinket> stolenTrinkets = new ArrayList<>();
     private final List<Item> items = new ArrayList<>();
     private int drunkenness = 0;
     private final java.util.Map<Curse, Integer> pendingCurses = new java.util.EnumMap<>(Curse.class);
@@ -417,6 +419,9 @@ public final class GameState {
     public List<Trinket> trinkets() {
         return Collections.unmodifiableList(trinkets);
     }
+
+
+    public List<Trinket> stolenTrinkets() {return Collections.unmodifiableList(stolenTrinkets);}
 
     /** Objets en inventaire, dans l'ordre des emplacements (vue non modifiable). */
     public List<Item> items() {
@@ -834,7 +839,7 @@ public final class GameState {
 
     /** Équipe un trinket et applique ses modificateurs. */
     void equipTrinket(Trinket trinket) {
-        if (trinkets.size() >= trinketSlots()) {
+        if (!hasRoomFor(trinket)) {
             throw new IllegalStateException("Plus d'emplacement de trinket");
         }
         addTrinket(trinket);
@@ -864,6 +869,40 @@ public final class GameState {
         refreshInventoryModifiers();
         return trinket;
     }
+
+
+
+    /** Retire le trinket de l’emplacement {@code slot} et le garde de côté (volé par l’adversaire, rendu s’il est vaincu)
+     * utilise {@link #unequipTrinket} pour garder la logique de perte de stat*/
+    Trinket stealTrinket(int slot) {
+        Trinket stolenTrinket = unequipTrinket(slot);
+        stolenTrinkets.add(stolenTrinket);
+        return stolenTrinket;
+    }
+
+
+    /** Rends tout les trinkets volés et vide la liste {@link stolenTrinkets}*/
+    List<Trinket> returnStolenTrinkets(){
+        List<Trinket> returned = List.copyOf(stolenTrinkets);
+        for(Trinket trinket : returned){
+            equipTrinket(trinket);
+        }
+        stolenTrinkets.clear();
+        return returned;
+    }
+
+
+    /**Check si il y assez de place pour rajouter un trinket en prenant en compte si il a un modifier de place*/
+    public boolean hasRoomFor(Trinket trinket){
+        int bonusSlots = 0;
+        for (StatModifier modifier : trinket.modifiers()) {
+            if (modifier.stat() == StatType.TRINKET_SLOTS && modifier.kind() == StatModifier.Kind.FLAT) {
+                bonusSlots += (int) modifier.value();
+            }
+        }
+        return trinkets.size() < (trinketSlots()+bonusSlots);
+    }
+
 
     void addItem(Item item) {
         if (items.size() >= itemSlots()) {

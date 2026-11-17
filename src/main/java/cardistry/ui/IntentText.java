@@ -69,6 +69,9 @@ public final class IntentText {
                     + say(e.enemy(), "te vole " + e.amount() + " Choomies !");
             case cardistry.core.event.GameEvent.CigarettesStolen e -> e.enemy().name() + " "
                     + say(e.enemy(), "te prend " + plural(e.amount(), "clope") + " !");
+            case cardistry.core.event.GameEvent.TrinketStolen e -> e.enemy().name() + " "
+                    + say(e.enemy(), "te vole " + e.trinket().name() + " !");
+            case cardistry.core.event.GameEvent.TrinketReturned e -> "Tu récupères " + e.trinket().name();
             case cardistry.core.event.GameEvent.EnemyElementChanged e -> e.enemy().name() + " "
                     + say(e.enemy(), "passe de l'élément " + e.previous().displayName() + " à l'élément "
                             + e.current().displayName() + " !");
@@ -108,7 +111,10 @@ public final class IntentText {
                     + num(state.hitDamage(tax.damage()));
             case MoveEffect.Gamble gamble -> percent(gamble.chance()) + " " + effect(state, gamble.onSuccess())
                     + ", sinon " + effect(state, gamble.onFailure());
+            case MoveEffect.StealTrinket steal -> percent(steal.chance()) + " de te voler un trinket, sans trinket : "
+                    + num(state.hitDamage(steal.fallbackDamage()));
             case MoveEffect.Dodge dodge -> "esquive ton prochain sort";
+            case MoveEffect.Drink drink -> "+" + drink.amount() + " Ivresse pour toi";
             case MoveEffect.CurseCard curse -> "une carte devient « " + curse.cardName() + " »";
             case MoveEffect.HealSelf heal -> "se soigne de "
                     + num(state.hasEnemy() ? cardistry.core.CombatFormula.heal(heal.amount() * state.currentEnemy().damageScale(),

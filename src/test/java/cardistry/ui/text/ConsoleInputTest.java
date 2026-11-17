@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import cardistry.core.Action;
 import cardistry.core.CombatEngine;
 import cardistry.core.GameState;
+import cardistry.core.RewardChoice;
 import cardistry.core.Rng;
 import cardistry.core.event.EventBus;
 import cardistry.items.ItemRegistry;
@@ -125,6 +126,70 @@ class ConsoleInputTest {
         assertTrue(text.contains("t) Retirer une carte : 75"));
         assertTrue(text.contains("Inventaire plein"));
         assertTrue(text.contains("Entre un numéro d'article"), "« x » est refusé");
+    }
+
+    // --- Un trinket qui apporte sa place (Diplôme EPFL) ---
+
+    private static cardistry.items.Trinket plain(String id) {
+        return cardistry.items.Trinket.builder(id, id, cardistry.items.Rarity.COMMON).build();
+    }
+
+    private static void fillTrinkets(GameState state, CombatEngine engine) {
+        for (int i = 0; state.trinkets().size() < state.trinketSlots(); i++) {
+            engine.equip(plain("t" + i));
+        }
+    }
+
+    @Test
+    void recompenseDiplomeAvecUneBarrePleineSansRemplacer() {
+        GameState state = GameState.newGame();
+        CombatEngine engine = new CombatEngine(state, new cardistry.model.card.CardPool(), new Rng(1), new EventBus());
+        fillTrinkets(state, engine);
+
+        RewardChoice choice = input("1\n").chooseReward(state, List.of(ItemRegistry.trinket("diplome-epfl")));
+
+        assertEquals(RewardChoice.Take.into(0), choice);
+        assertFalse(out.toString(StandardCharsets.UTF_8).contains("Inventaire plein"));
+    }
+
+    @Test
+    void recompenseTrinketNormalAvecUneBarrePleineDemandeLeRemplacement() {
+        GameState state = GameState.newGame();
+        CombatEngine engine = new CombatEngine(state, new cardistry.model.card.CardPool(), new Rng(1), new EventBus());
+        fillTrinkets(state, engine);
+
+        RewardChoice choice = input("1\n2\n").chooseReward(state, List.of(plain("nouveau")));
+
+        assertEquals(new RewardChoice.Take(0, 1), choice);
+        assertTrue(out.toString(StandardCharsets.UTF_8).contains("Inventaire plein"));
+    }
+
+    @Test
+    void shopDiplomeAvecUneBarrePleineSansRemplacer() {
+        GameState state = null;
+        cardistry.core.Shop shop = null;
+        int index = -1;
+        for (long seed = 0; index < 0; seed++) {
+            assertTrue(seed < 2000, "aucune graine ne met le Diplôme en vente");
+            state = GameState.newGame();
+            CombatEngine engine = new CombatEngine(state, new cardistry.model.card.CardPool(), new Rng(seed), new EventBus());
+            engine.start();
+            fillTrinkets(state, engine);
+            engine.gainChoomies(10_000);
+            engine.openShop();
+            shop = engine.shop().orElseThrow();
+            for (int i = 0; i < shop.offers().size(); i++) {
+                if (shop.offers().get(i) instanceof cardistry.core.shop.ShopOffer.CollectibleOffer c
+                        && c.collectible().id().equals("diplome-epfl")) {
+                    index = i;
+                }
+            }
+        }
+
+        cardistry.core.shop.ShopAction action = input((index + 1) + "\n").chooseShopAction(state, shop, 75);
+
+        assertEquals(cardistry.core.shop.ShopAction.Buy.of(index), action);
+        assertFalse(out.toString(StandardCharsets.UTF_8).contains("Inventaire plein"));
     }
 
     @Test

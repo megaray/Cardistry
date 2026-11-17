@@ -179,6 +179,14 @@ public sealed interface GameEvent {
     record CigarettesStolen(Enemy enemy, int amount) implements GameEvent {
     }
 
+    /** L'adversaire te prend un trinket. */
+    record TrinketStolen(Enemy enemy, Trinket trinket) implements GameEvent {
+    }
+
+    /** L'adversaire te rend un trinket. */
+    record TrinketReturned(Trinket trinket) implements GameEvent {
+    }
+
     /** Nouveau niveau de la carte (1 à 3). */
     record LevelStarted(int level) implements GameEvent {
     }

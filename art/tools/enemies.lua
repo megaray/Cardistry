@@ -614,6 +614,120 @@ local function gobelinSprite()
   return sprite
 end
 
+-- ------------------------------------------------------------------ Nortin (boss du niveau 1, neutre)
+-- Costaud, longs cheveux blonds avec frange, débardeur bleu clair, sourcils froncés. Mains vides, bras
+-- le long du corps ; à l'attaque, le bras côté joueur part en gifle (Bitch slap).
+
+local function nortin(c, pose)
+  local bob = pose.alt and 1 or 0
+  -- bras (derrière le corps) : à droite, toujours le long du corps
+  c:ellipse(51, 47, 6, 11, "s"); c:vline(46, 40, 56, "p"); c:disc(52, 58, 4, "s")
+  if pose.attack then
+    -- gifle : bras tendu vers le joueur, main ouverte, traits de vitesse
+    local reach = pose.attack * 3
+    c:line(17, 40, 5 - reach, 33, "s", 6)
+    c:disc(4 - reach, 34, 4, "s"); c:hline(0 - reach, 3 - reach, 31, "s"); c:hline(0 - reach, 3 - reach, 37, "s")
+    c:hline(9 - reach, 15 - reach, 41, "p")
+    if pose.attack == 2 then
+      c:vline(10, 26, 30, "6"); c:vline(13, 24, 29, "6"); c:vline(16, 26, 30, "6")
+    end
+  else
+    c:ellipse(13, 47, 6, 11, "s"); c:vline(18, 40, 56, "p"); c:disc(12, 58, 4, "s")
+  end
+  -- épaules, débardeur et bretelles
+  c:ellipse(32, 41, 19, 7, "s")
+  c:ellipse(32, 46, 16, 4, "B"); c:rect(16, 46, 33, 18, "B"); c:rect(43, 46, 6, 18, "b")
+  c:ellipse(32, 42, 7, 4, "s")
+  c:rect(19, 35, 4, 11, "B"); c:rect(42, 35, 4, 11, "B"); c:vline(45, 35, 45, "b")
+  c:arc(32, 58, 12, 4, 200, 340, "b")
+  local h = c:shift(0, bob)
+  -- cheveux (derrière le visage), jusqu'aux épaules
+  h:ellipse(32, 14, 16, 12, "Y"); h:rect(16, 14, 33, 21, "Y")
+  h:vline(19, 18, 34, "y"); h:vline(22, 24, 34, "y"); h:vline(42, 24, 34, "y"); h:vline(45, 18, 34, "y")
+  -- visage rond et cou
+  h:rect(27, 31, 11, 5, "s")
+  h:ellipse(32, 22, 11, 11, "s"); h:ellipse(32, 28, 12, 6, "s"); h:arc(32, 28, 12, 6, 20, 160, "p")
+  -- frange
+  h:ellipse(32, 11, 12, 5, "Y"); h:rect(20, 11, 25, 4, "Y")
+  h:px(24, 15, "y"); h:px(28, 15, "y"); h:px(33, 15, "y"); h:px(38, 15, "y"); h:px(42, 14, "y")
+  -- yeux et sourcils
+  if pose.hurt then
+    xEye(h, 24, 19, 3, "1"); xEye(h, 36, 19, 3, "1")
+  else
+    h:line(22, 16, 29, 19, "N", 2); h:line(42, 16, 35, 19, "N", 2)
+    h:rect(25, 20, 3, 2, "1"); h:rect(37, 20, 3, 2, "1")
+    h:hline(25, 27, 23, "p"); h:hline(37, 39, 23, "p")
+  end
+  -- nez et bouche
+  h:rect(31, 21, 3, 5, "p"); h:hline(30, 34, 26, "n")
+  if pose.hurt or pose.attack == 2 then
+    h:ellipse(32, 30, 3, 2, "1")
+  else
+    h:arc(32, 32, 5, 2, 200, 340, "N")
+  end
+end
+
+-- ------------------------------------------------------------------ Zo le StreMon (boss du niveau 2, algébrique)
+-- Cheveux ondulés blond foncé, yeux bleus, lunettes rondes écaille, henley blanc sous une veste en cuir brun,
+-- petite chaîne dorée ; il parle tout le temps (bouche ouverte). À l'attaque (Coup de teub), il fonce
+-- vers le joueur, traits de vitesse.
+
+local function zo(c, pose)
+  local bob = pose.alt and 1 or 0
+  -- bras (derrière le corps) : à droite, toujours le long du corps
+  c:ellipse(50, 49, 6, 12, "n"); c:disc(51, 61, 3, "s")
+  if pose.attack then
+    c:ellipse(15, 47, 6, 10, "n"); c:disc(17, 56, 3, "s")
+  else
+    c:ellipse(14, 49, 6, 12, "n"); c:disc(13, 61, 3, "s")
+  end
+  -- veste en cuir brun ouverte (coutures), henley blanc
+  c:ellipse(32, 43, 18, 6, "n"); c:rect(14, 43, 37, 21, "n")
+  c:line(24, 41, 18, 50, "N", 2); c:line(40, 41, 46, 50, "N", 2)
+  c:vline(19, 51, 63, "N"); c:vline(45, 51, 63, "N")
+  c:vline(16, 46, 58, "o"); c:vline(48, 46, 56, "o")
+  c:rect(25, 40, 15, 24, "6"); c:vline(39, 40, 63, "5"); c:vline(25, 40, 63, "5")
+  c:vline(24, 40, 63, "N"); c:vline(40, 40, 63, "N")
+  -- boutons du henley et chaîne
+  c:px(32, 46, "4"); c:px(32, 49, "4"); c:px(32, 52, "4")
+  c:arc(32, 40, 6, 4, 20, 160, "y")
+  if pose.attack then
+    for i = 0, 2 do c:hline(8 - pose.attack * 2, 13 - pose.attack * 2, 50 + i * 4, "6") end
+  end
+  local h = c:shift(0, bob)
+  -- cou et visage
+  h:rect(28, 30, 9, 8, "s"); h:hline(29, 35, 37, "5")
+  h:ellipse(32, 22, 11, 12, "s")
+  h:disc(21, 23, 2, "s")
+  -- cheveux ondulés, du volume sur le dessus
+  h:ellipse(32, 9, 16, 8, "y"); h:ellipse(24, 4, 5, 3, "y"); h:ellipse(36, 3, 6, 3, "y")
+  h:rect(19, 9, 4, 10, "y"); h:rect(42, 9, 4, 9, "y")
+  h:ellipse(26, 12, 6, 3, "y"); h:ellipse(38, 11, 7, 3, "y")
+  for _, w in ipairs({ { 20, 7 }, { 25, 5 }, { 31, 4 }, { 37, 5 }, { 43, 7 } }) do
+    h:arc(w[1], w[2] + 2, 3, 2, 180, 360, "Y")
+  end
+  h:arc(26, 14, 4, 2, 0, 180, "Y"); h:arc(37, 14, 4, 2, 0, 180, "Y")
+  h:arc(23, 16, 2, 2, 270, 450, "y"); h:arc(29, 16, 2, 2, 270, 450, "y"); h:arc(41, 15, 2, 2, 90, 270, "y")
+  h:vline(20, 12, 18, "n"); h:vline(44, 11, 16, "n"); h:px(31, 14, "n")
+  -- lunettes rondes écaille
+  h:arc(26, 21, 4, 4, 0, 360, "N"); h:arc(38, 21, 4, 4, 0, 360, "N"); h:hline(30, 34, 20, "N")
+  h:line(22, 20, 20, 19, "N")
+  if pose.hurt then
+    xEye(h, 24, 19, 3, "1"); xEye(h, 36, 19, 3, "1")
+  else
+    h:rect(25, 20, 2, 2, "u"); h:rect(37, 20, 2, 2, "u")
+    h:line(23, 15, 28, 16, "y"); h:line(36, 16, 41, 15, "y")
+  end
+  -- nez et bouche ouverte (il parle)
+  h:vline(32, 22, 26, "p"); h:px(31, 26, "p")
+  if pose.hurt or pose.attack == 2 then
+    h:ellipse(31, 30, 3, 2, "1")
+  else
+    h:ellipse(31, 30, 3, 1, "d")
+  end
+  h:hline(29, 33, 29, "6")
+end
+
 -- ------------------------------------------------------------------ placeholders
 -- Choomah, Clarence et le boss sont dessinés à la main : une silhouette « ? » en attendant, avec le
 -- seul tag idle. Remplacer le dessin dans le .aseprite (le script n'y touchera plus).
@@ -640,7 +754,7 @@ return {
   standard("came", came), standard("paresseux", paresseux), standard("le-peneu", peneu),
   standard("t-rex-defonce", trex), standard("etudiant-post-examen", etudiant), standard("vafi", vafi),
   standard("gourou-du-sat", gourou), standard("ng", ng), standard("hypercube-misogyne", hypercube),
-  gobelinSprite(), standard("engeance-des-cookies", engeance),
+  gobelinSprite(), standard("engeance-des-cookies", engeance), standard("nortin", nortin), standard("zo", zo),
   placeholder("choomah", false), placeholder("clarence", false), placeholder("boss", true),
 }
 

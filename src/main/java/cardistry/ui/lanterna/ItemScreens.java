@@ -331,8 +331,8 @@ final class ItemScreens {
     }
 
     static boolean isFull(GameState state, Collectible c) {
-        return c instanceof Trinket
-                ? state.trinkets().size() >= state.trinketSlots()
+        return c instanceof Trinket trinket
+                ? !state.hasRoomFor(trinket)
                 : state.items().size() >= state.itemSlots();
     }
 

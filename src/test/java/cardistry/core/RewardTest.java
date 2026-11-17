@@ -118,6 +118,37 @@ class RewardTest {
     }
 
     @Test
+    void diplomePrisAvecUneBarrePleineSansRemplacer() {
+        Trinket diplome = cardistry.items.ItemRegistry.trinket("diplome-epfl");
+        killHydraWith(List.of(diplome));
+        for (int i = 0; i < 5; i++) {
+            engine.equip(trinket("vieux" + i));
+        }
+
+        assertTrue(engine.resolveReward(RewardChoice.Take.into(0)));
+
+        assertFalse(events.contains(new GameEvent.ActionRejected(Reason.INVENTORY_FULL)));
+        assertTrue(state.hasTrinket("diplome-epfl"));
+        assertEquals(6, state.trinkets().size());
+        assertEquals(6, state.trinketSlots());
+    }
+
+    @Test
+    void trinketNormalPrisAvecUneBarrePleineToujoursRefuse() {
+        killHydraWith(List.of(trinket("nouveau")));
+        for (int i = 0; i < 5; i++) {
+            engine.equip(trinket("vieux" + i));
+        }
+
+        assertFalse(engine.resolveReward(RewardChoice.Take.into(0)));
+
+        assertEquals(new GameEvent.ActionRejected(Reason.INVENTORY_FULL), events.get(events.size() - 1));
+        assertTrue(engine.hasPendingReward());
+        assertFalse(state.hasTrinket("nouveau"));
+        assertEquals(5, state.trinkets().size());
+    }
+
+    @Test
     void remplacerUnTrinketRetireSesModificateurs() {
         Trinket briquets = cardistry.items.ItemRegistry.trinkets().get(0);
         killHydraWith(List.of(trinket("nouveau")));

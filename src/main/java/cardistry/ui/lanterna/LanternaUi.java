@@ -411,7 +411,8 @@ public final class LanternaUi implements Renderer, Input, AutoCloseable {
             default -> {
                 String line = cardistry.ui.IntentText.journal(event);
                 if (line != null) {
-                    view.log(line, event instanceof GameEvent.ChoomiesChanged ? Palette.ACCENT : Palette.WARNING);
+                    boolean good = event instanceof GameEvent.ChoomiesChanged || event instanceof GameEvent.TrinketReturned;
+                    view.log(line, good ? Palette.ACCENT : Palette.WARNING);
                     render();
                 }
             }

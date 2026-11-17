@@ -209,6 +209,40 @@ class ShopTest {
                 && b.replaced() != null && b.replaced().id().equals("mate")));
     }
 
+    /** Shop ouvert avec 5 trinkets équipés ; l'index du Diplôme EPFL en vente, ou -1. */
+    private int openFullShopWithDiplome(long seed) {
+        setUp(seed, 12);
+        for (int i = 0; i < 5; i++) {
+            engine.equip(Trinket.builder("t" + i, "t" + i, Rarity.COMMON).build());
+        }
+        state.setChoomies(10_000);
+        engine.openShop();
+        for (int i = 0; i < shop().offers().size(); i++) {
+            if (shop().offers().get(i) instanceof ShopOffer.CollectibleOffer c
+                    && c.collectible().id().equals("diplome-epfl")) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    @Test
+    void diplomeAcheteAvecUneBarrePleineSansRemplacer() {
+        long seed = 0;
+        int index;
+        while ((index = openFullShopWithDiplome(seed)) < 0) {
+            assertTrue(++seed < 2000, "aucune graine ne met le Diplôme en vente");
+        }
+        int price = ((ShopOffer.CollectibleOffer) shop().offers().get(index)).price();
+
+        assertTrue(engine.shopAction(ShopAction.Buy.of(index)));
+
+        assertFalse(rejected(Reason.INVENTORY_FULL));
+        assertTrue(state.hasTrinket("diplome-epfl"));
+        assertEquals(6, state.trinkets().size());
+        assertEquals(10_000 - price, state.choomies());
+    }
+
     @Test
     void trinketsPleinsRemplacer() {
         open(2, 1000);

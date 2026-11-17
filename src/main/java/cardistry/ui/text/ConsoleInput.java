@@ -151,8 +151,9 @@ public final class ConsoleInput implements Input {
             }
             Collectible taken = options.get(choice - 1);
             List<? extends Collectible> owned = taken instanceof Trinket ? state.trinkets() : state.items();
-            int slots = taken instanceof Trinket ? state.trinketSlots() : state.itemSlots();
-            if (owned.size() < slots) {
+            int slots = taken instanceof Trinket  ? state.trinketSlots() : state.itemSlots();
+            boolean room = taken instanceof Trinket trinket ? state.hasRoomFor(trinket) : owned.size() < slots;
+            if (room) {
                 return RewardChoice.Take.into(choice - 1);
             }
             console.println("Inventaire plein. Que remplace " + taken.name() + " ?");
@@ -252,7 +253,8 @@ public final class ConsoleInput implements Input {
                 && state.choomies() >= c.price()) {
             List<? extends Collectible> owned = c.collectible() instanceof Trinket ? state.trinkets() : state.items();
             int slots = c.collectible() instanceof Trinket ? state.trinketSlots() : state.itemSlots();
-            if (owned.size() >= slots) {
+            boolean room = c.collectible() instanceof Trinket trinket ? state.hasRoomFor(trinket) : owned.size() < slots;
+            if (!room) {
                 console.println("Inventaire plein. Que remplace " + c.collectible().name() + " ?");
                 for (int i = 0; i < owned.size(); i++) {
                     console.println("[" + (i + 1) + "] " + owned.get(i).name() + " : " + owned.get(i).description());

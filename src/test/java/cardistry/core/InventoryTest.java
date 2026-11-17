@@ -170,4 +170,217 @@ class InventoryTest {
         assertEquals(7, state.hand().size());
         assertEquals(1, events.stream().filter(GameEvent.CardDrawn.class::isInstance).count());
     }
+
+    // --- Trinkets volés (Nortin) ---
+
+    private static Trinket plain(String id, Tag... tags) {
+        return Trinket.builder(id, id, Rarity.COMMON).tags(tags).build();
+    }
+
+    @Test
+    void volerUnTrinketLeDeplaceDansLesTrinketsVoles() {
+        setUp(List.of(), hydra());
+        Trinket trinket = plain("t");
+        engine.equip(trinket);
+
+        Trinket stolen = state.stealTrinket(0);
+
+        assertEquals(trinket, stolen);
+        assertFalse(state.hasTrinket("t"));
+        assertTrue(state.trinkets().isEmpty());
+        assertEquals(List.of(trinket), state.stolenTrinkets());
+    }
+
+    @Test
+    void unTrinketVolePerdSonBonusDeStats() {
+        setUp(List.of(), hydra());
+        engine.equip(cardistry.items.ItemRegistry.trinket("redistribution-des-briquets"));
+        assertEquals(1.25, state.playerStats().get(StatType.FIRE_DAMAGE), DELTA);
+
+        state.stealTrinket(0);
+
+        assertEquals(1.0, state.playerStats().get(StatType.FIRE_DAMAGE), DELTA);
+    }
+
+    @Test
+    void unTrinketVoleRecalculeLesBonusDeSet() {
+        setUp(List.of(), hydra());
+        engine.equip(plain("a", Tag.EPFL));
+        engine.equip(plain("b", Tag.EPFL));
+        assertEquals(1.10, state.playerStats().get(StatType.WATER_DAMAGE), DELTA); // EPFL « Cursus » à 2
+        assertFalse(state.activeSetTiers().isEmpty());
+
+        state.stealTrinket(0);
+
+        assertEquals(1.0, state.playerStats().get(StatType.WATER_DAMAGE), DELTA);
+        assertTrue(state.activeSetTiers().isEmpty());
+    }
+
+    @Test
+    void volerUnTrinketGardeLesAutresDansLOrdre() {
+        setUp(List.of(), hydra());
+        Trinket first = plain("a");
+        Trinket middle = plain("b");
+        Trinket last = plain("c");
+        engine.equip(first);
+        engine.equip(middle);
+        engine.equip(last);
+
+        state.stealTrinket(1);
+
+        assertEquals(List.of(first, last), state.trinkets());
+        assertEquals(List.of(middle), state.stolenTrinkets());
+    }
+
+    @Test
+    void lesTrinketsVolesSontEnLectureSeule() {
+        setUp(List.of(), hydra());
+        assertThrows(UnsupportedOperationException.class, () -> state.stolenTrinkets().add(plain("t")));
+    }
+
+    // --- Trinkets rendus (Nortin vaincu) ---
+
+    @Test
+    void lesTrinketsRendusVontALaFinDansLOrdreDuVol() {
+        setUp(List.of(), hydra());
+        Trinket a = plain("a");
+        Trinket b = plain("b");
+        Trinket c = plain("c");
+        Trinket d = plain("d");
+        engine.equip(a);
+        engine.equip(b);
+        engine.equip(c);
+        engine.equip(d);
+        state.stealTrinket(2); // c
+        state.stealTrinket(0); // a
+
+        List<Trinket> returned = state.returnStolenTrinkets();
+
+        assertEquals(List.of(c, a), returned);
+        assertEquals(List.of(b, d, c, a), state.trinkets());
+    }
+
+    @Test
+    void unTrinketRenduRetrouveSonBonusDeStats() {
+        setUp(List.of(), hydra());
+        engine.equip(cardistry.items.ItemRegistry.trinket("redistribution-des-briquets"));
+        state.stealTrinket(0);
+        assertEquals(1.0, state.playerStats().get(StatType.FIRE_DAMAGE), DELTA);
+
+        state.returnStolenTrinkets();
+
+        assertEquals(1.25, state.playerStats().get(StatType.FIRE_DAMAGE), DELTA);
+    }
+
+    @Test
+    void unTrinketRenduRecalculeLesBonusDeSet() {
+        setUp(List.of(), hydra());
+        engine.equip(plain("a", Tag.EPFL));
+        engine.equip(plain("b", Tag.EPFL));
+        state.stealTrinket(0);
+        assertTrue(state.activeSetTiers().isEmpty());
+
+        state.returnStolenTrinkets();
+
+        assertEquals(1.10, state.playerStats().get(StatType.WATER_DAMAGE), DELTA); // EPFL « Cursus » à 2
+        assertFalse(state.activeSetTiers().isEmpty());
+    }
+
+    @Test
+    void apresLeRetourPlusRienAVoleEtRienNEstRenduDeuxFois() {
+        setUp(List.of(), hydra());
+        Trinket trinket = plain("t");
+        engine.equip(trinket);
+        state.stealTrinket(0);
+        state.returnStolenTrinkets();
+
+        assertTrue(state.stolenTrinkets().isEmpty());
+        assertTrue(state.returnStolenTrinkets().isEmpty());
+        assertEquals(List.of(trinket), state.trinkets());
+    }
+
+    @Test
+    void sansVolRienARendre() {
+        setUp(List.of(), hydra());
+        Trinket trinket = plain("t");
+        engine.equip(trinket);
+
+        assertTrue(state.returnStolenTrinkets().isEmpty());
+        assertEquals(List.of(trinket), state.trinkets());
+    }
+
+    @Test
+    void diplomeRenduEnDernierAvecUneBarrePleine() {
+        setUp(List.of(), hydra());
+        Trinket diplome = cardistry.items.ItemRegistry.trinket("diplome-epfl");
+        engine.equip(diplome);
+        equipPlains(5); // 6 / 6 : [Diplôme, t0, t1, t2, t3, t4]
+        Trinket x = state.trinkets().get(3); // t2
+        state.stealTrinket(3);
+        state.stealTrinket(0); // le Diplôme : 4 trinkets pour 5 emplacements
+
+        state.returnStolenTrinkets();
+
+        assertEquals(6, state.trinkets().size());
+        assertEquals(6, state.trinketSlots());
+        assertEquals(x, state.trinkets().get(4));
+        assertEquals(diplome, state.trinkets().get(5));
+    }
+
+    // --- Un trinket qui apporte sa place (Diplôme EPFL) ---
+
+    private void equipPlains(int count) {
+        for (int i = 0; i < count; i++) {
+            engine.equip(plain("t" + i));
+        }
+    }
+
+    @Test
+    void barreNonPleineAccepteUnTrinketNormal() {
+        setUp(List.of(), hydra());
+        equipPlains(4);
+
+        assertTrue(state.hasRoomFor(plain("x")));
+    }
+
+    @Test
+    void barrePleineRefuseUnTrinketNormal() {
+        setUp(List.of(), hydra());
+        equipPlains(5);
+
+        assertFalse(state.hasRoomFor(plain("x")));
+    }
+
+    @Test
+    void barrePleineAccepteLeDiplomeQuiApporteSaPlace() {
+        setUp(List.of(), hydra());
+        equipPlains(5);
+
+        assertTrue(state.hasRoomFor(cardistry.items.ItemRegistry.trinket("diplome-epfl")));
+    }
+
+    @Test
+    void diplomeEquipeAvecUneBarrePleineVaALaFin() {
+        setUp(List.of(), hydra());
+        equipPlains(5);
+        Trinket diplome = cardistry.items.ItemRegistry.trinket("diplome-epfl");
+
+        engine.equip(diplome);
+
+        assertEquals(6, state.trinkets().size());
+        assertEquals(6, state.trinketSlots());
+        assertEquals(diplome, state.trinkets().get(5));
+    }
+
+    @Test
+    void trinketNormalAvecUneBarrePleineToujoursRefuse() {
+        setUp(List.of(), hydra());
+        equipPlains(5);
+
+        IllegalStateException e = assertThrows(IllegalStateException.class, () -> engine.equip(plain("x")));
+
+        assertEquals("Plus d'emplacement de trinket", e.getMessage());
+        assertEquals(5, state.trinkets().size());
+        assertFalse(state.hasTrinket("x"));
+    }
 }

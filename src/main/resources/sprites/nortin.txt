@@ -1,0 +1,70 @@
+@name Nortin
+@# Boss du niveau 1 : longs cheveux blonds, sourcils froncés, débardeur bleu ; à l'attaque, la gifle.
+@frame idle
+      .--------.
+     /''''''''''\
+    ||\__    __/||
+    || (o)  (o) ||
+    ||    db    ||
+    ||   .--.   ||
+    |_\________/_|
+   ( (|\      /|) )
+   | ||  \__/  || |
+   | ||        || |
+@colors
+      YYYYYYYYYY
+     YYYYYYYYYYYY
+    YYkkk    kkkYY
+    YY wkw  wkw YY
+    YY    rr    YY
+    YY   rrrr   YY
+    YYwwwwwwwwwwYY
+   w wBB      BBw w
+   w wB  BBBB  Bw w
+   w wB        Bw w
+
+@frame idle
+      .--------.
+     /''''''''''\
+    ||\__    __/||
+    || (-)  (-) ||
+    ||    db    ||
+    ||   .--.   ||
+    |_\________/_|
+   ( (|\      /|) )
+   | ||  \__/  || |
+   | ||        || |
+@frame attack
+      .--------.
+     /''''''''''\
+    ||\__    __/||
+    || (O)  (O) ||
+    ||    db    ||
+    ||   (  )   ||
+    |_\________/_|
+<====(|\      /|) )
+     ||  \__/  || |
+     ||        || |
+@colors
+      YYYYYYYYYY
+     YYYYYYYYYYYY
+    YYkkk    kkkYY
+    YY wkw  wkw YY
+    YY    rr    YY
+    YY   rrrr   YY
+    YYwwwwwwwwwwYY
+wwwwwwBB      BBw w
+      B  BBBB  Bw w
+      B        Bw w
+
+@frame hurt
+      .--------.
+     /''''''''''\
+    ||\__    __/||
+    || (x)  (x) ||
+    ||    db    ||
+    ||   (  )   ||
+    |_\________/_|
+   ( (|\      /|) )
+   | ||  \__/  || |
+   | ||        || |

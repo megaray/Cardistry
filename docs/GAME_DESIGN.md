@@ -69,7 +69,9 @@ Valeurs ci-dessous au niveau 1 ; leurs stats sont dans « Stats des adversaires 
 | Commun | Hypercube misogyne | Géométrique | 25 | Tunnel topologique 5 ; tous les 3 tours, Célibat forcé (« ouin ouin ») 2 × 4 |
 | Commun | Gobelin | Plante | 22 | « 67 » (six seveeen) : 6 ou 7, chaque tour ; animation des deux mains et « SIX SEVEEEN ! » à l'écran |
 | Élite | Engeance des cookies | GLITCH | 60 | Défoncée au space cookie. Piège pâtissier 9 ; tous les 3 tours, Green out : t'endort (Fons 1 tour) ; une fois sous 50 % PV, Méditation triptyque : passe à un autre élément (tiré au hasard, ni neutre ni GLITCH) jusqu'à la fin du combat |
-| Boss | Boss du niveau 1 / 2 / 3 (**noms à venir**) | Feu / Eau / Plante | 130 / 200 / 280 | Coup 10 ; toutes les 4 attaques, Grosse attaque 22 |
+| Boss | Nortin (niveau 1) | Neutre | 160 | Cycle de 4 tours : Bitch slap 8 → Esquive (70 % d'esquiver ton prochain sort, sinon Bitch slap) → Vol de trinket (20 % de te voler un trinket, rendu si tu le bats ; sans trinket : Bitch slap) → Hit in the nuts 16 |
+| Boss | Zo le StreMon (niveau 2) | Algébrique | 250 | Cycle de 6 tours : Coup de teub 8 → Coup de teub 8 → Un dernier p'tit verre (5 dégâts, +1 Ivresse pour toi) → Coup de teub 8 → P'tite clope (se soigne de 10) → Capoeira 12 |
+| Boss | Boss du niveau 3 (**nom à venir**) | Plante | 280 | Coup 10 ; toutes les 4 attaques, Grosse attaque 22 |
 
 Statuts infligés (tirages de l'adversaire, pas doublés par CLAUDE.md) :
 
@@ -93,6 +95,14 @@ Règles communes :
 - Esquive : seul le prochain **sort** est esquivé (un Shot de Jäger actif est consommé quand même).
 - Cartes mortes (« NO CARDS », « Exercice 3b ») : injouables jusqu'à la fin du combat, jamais remplacées.
 - Choomah : variante tirée au hasard ; deux Choomah ne se suivent pas, ni deux fois le même commun.
+- **Vol de trinket** (Nortin) : 20 % (tirage de l'adversaire, pas doublé par CLAUDE.md), sinon rien ; un
+    trinket équipé tiré au hasard, secrets compris ; un par vol réussi, il peut en voler plusieurs dans le combat ;
+    sans trinket, Bitch slap à la place. Moscow Mule et l'immunité de Fons l'empêchent. Le Diplôme EPFL se vole comme les autres : il libère sa propre place, rien à jeter. Tous les trinkets volés sont rendus à la mort de
+    l'adversaire, à la fin de la barre dans l'ordre du vol, avant ses effets (Monde Snack, Pétou ancestral…) et la
+    récompense (un trinket rendu n'y est donc jamais proposé). Sur une défaite, ils restent perdus.
+- **Un dernier p'tit verre** (Zo le StreMon) : un coup de 5, puis +1 Ivresse pour toi (palier, bonus de dégâts et
+    Gueule de bois au seuil, comme une boisson). Moscow Mule et l'immunité de Fons annulent le coup, pas l'Ivresse.
+    Gueule de bois éventuelle : au premier combat du niveau 3.
 
 ## Structure d'une run
 - **3 niveaux** (sans nom) de **8 étages** chacun, boss compris : étages 1-6 au choix, 7 = Sieste, 8 = Boss.
@@ -266,8 +276,8 @@ Valeurs au niveau 1 (FOR, INT, ESP, DEF, RES, CHA), code : `EnemyRegistry` (tabl
 | T-Rex défoncé (élite) | 4 | 0 | 1 | 2 | 0 | 0 | FOR énorme, RES nulle : facile à statuer |
 | Étudiant post-examen (élite) | 1 | 3 | 0 | 0 | 0 | 2 | Épuisé : aucune défense |
 | Engeance des cookies (élite) | 2 | 3 | 2 | 1 | 3 | 2 | Équilibrée et imprévisible |
-| Boss du niveau 1 | 3 | 1 | 1 | 2 | 3 | 1 | Test des stats |
-| Boss du niveau 2 | 4 | 2 | 2 | 3 | 4 | 2 | Exige un build |
+| Nortin | 3 | 1 | 1 | 2 | 3 | 1 | Test des stats |
+| Zo le StreMon | 4 | 4 | 2 | 3 | 4 | 2 | Exige un build |
 | Boss du niveau 3 | 5 | 3 | 3 | 4 | 5 | 3 | Fin de run |
 
 Les boss ont une RES élevée pour qu'on ne puisse pas les enchaîner en Fons ou en Intox ; leurs stats seront à
@@ -321,6 +331,7 @@ Seuls les **trinkets équipés** comptent (pas les objets). Un trinket compte po
 **Diplôme EPFL** (Légendaire, EPFL) : +1 emplacement de trinket, effet des trinkets EPFL ×2, bonus de set EPFL ×2 ; il compte lui-même dans le set EPFL. Effet boule de neige **voulu**.
 - **Tout l'effet des trinkets EPFL est doublé, malus compris** (CMS : +100 % / adversaire +50 % ; Photocopieuse : 3 cartes ; Latte macchiato vanille : +2 cartes ; M1 et Plan du campus : 10). Le Diplôme ne se double pas lui-même (+1 emplacement seulement).
 - Si on perd le Diplôme avec 6 trinkets équipés, le joueur doit **immédiatement choisir un trinket à jeter** (écran de choix, pas de tirage au hasard) — sinon c'est exploitable.
+- Un trinket qui apporte ses propres emplacements (le Diplôme aujourd'hui) **s'équipe même barre pleine, sans remplacement** : il se met à la fin de la barre (récompense, shop, trinket rendu par Nortin).
 
 ### Ivresse
 - Chaque **boisson** (objet tagué Boisson) donne **+1 Ivresse**. L'Ivresse retombe à 0 après chaque combat.
@@ -626,7 +637,7 @@ Reste : transitions d'écran ; vrais sons des statuts ; vrais sprites des person
 - Couleur de rareté et d'élément partout.
 
 ## Questions ouvertes
-- **[À DÉCIDER]** Noms et attaques des 3 boss (placeholders « Boss du niveau 1/2/3 »).
+- **[À DÉCIDER]** Nom et attaques du boss du niveau 3 (placeholder « Boss du niveau 3 »).
 - **[À DÉCIDER]** Noms des variantes de Choomah (provisoires : « Choomah pressé », « Choomah costaud »).
 - **[À DÉCIDER]** Nom du vendeur du shop et sa réplique d'accueil. Il a un sprite (ébauche : bonnet, barbe, clope au bec) et il fume.
 - **[À DÉCIDER]** Dave : son soin profite-t-il des bonus de soin (efficacité, Ross) ou est-il brut ? *Provisoire : il en profite.*

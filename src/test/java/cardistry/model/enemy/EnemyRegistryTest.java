@@ -91,7 +91,7 @@ class EnemyRegistryTest {
         assertEquals(List.of(2, 0, 0, 3, 2, 0), stats(create(CADDIE, 2)));
         assertEquals(List.of(3, 0, 0, 4, 2, 0), stats(create(CADDIE, 3)));
         assertEquals(List.of(3, 1, 1, 2, 3, 1), stats(create(bossId(1), 1)));
-        assertEquals(List.of(4, 2, 2, 3, 4, 2), stats(create(bossId(2), 2)));
+        assertEquals(List.of(4, 4, 2, 3, 4, 2), stats(create(bossId(2), 2)));
         assertEquals(List.of(5, 3, 3, 4, 5, 3), stats(create(bossId(3), 3)));
     }
 
@@ -104,15 +104,79 @@ class EnemyRegistryTest {
 
     @Test
     void bossPvFixesDegatsSelonLeNiveau() {
-        assertEquals(130, create(bossId(1), 1).maxHp(), DELTA);
-        assertEquals(200, create(bossId(2), 2).maxHp(), DELTA);
+        // Niveaux 1 et 2 (Nortin, Zo le StreMon) : voir les tests nortin… et zo… ci-dessous.
         assertEquals(280, create(bossId(3), 3).maxHp(), DELTA);
         assertEquals(1.5, create(bossId(3), 3).damageScale(), DELTA);
-        for (int level = 1; level <= 3; level++) {
-            Enemy boss = create(bossId(level), level);
-            assertEquals(EnemyRank.BOSS, boss.rank());
-            assertEquals(List.of("coup", "coup", "coup", "grosse-attaque", "coup"), ids(moves(boss, 5)));
-        }
+        Enemy boss = create(bossId(3), 3);
+        assertEquals(EnemyRank.BOSS, boss.rank());
+        assertEquals(List.of("coup", "coup", "coup", "grosse-attaque", "coup"), ids(moves(boss, 5)));
+    }
+
+    @Test
+    void nortinEstLeBossDuNiveauUn() {
+        Enemy nortin = create(bossId(1), 1);
+        assertEquals("Nortin", nortin.name());
+        assertEquals(Element.NEUTRAL, nortin.element());
+        assertEquals(EnemyRank.BOSS, nortin.rank());
+        assertEquals(160, nortin.maxHp(), DELTA);
+        assertEquals("nortin", nortin.spriteId());
+    }
+
+    @Test
+    void leBossDuNiveauTroisGardeLeSpriteCommun() {
+        assertEquals("boss", create(bossId(3), 1).spriteId());
+    }
+
+    // --- Zo le StreMon (boss du niveau 2) ---
+
+    @Test
+    void zoEstLeBossDuNiveauDeux() {
+        Enemy zo = create(bossId(2), 2);
+        assertEquals("Zo le StreMon", zo.name());
+        assertEquals(Element.ALGEBRAIC, zo.element());
+        assertEquals(EnemyRank.BOSS, zo.rank());
+        assertEquals(250, zo.maxHp(), DELTA); // PV fixes, comme tous les boss
+        assertEquals(1.25, zo.damageScale(), DELTA);
+        assertEquals("zo", zo.spriteId());
+    }
+
+    @Test
+    void zoRepeteUnCycleDeSixTours() {
+        List<String> cycle = List.of("coup-de-teub", "coup-de-teub", "ptit-verre", "coup-de-teub", "petite-clope",
+                "capoeira");
+        List<String> twice = new ArrayList<>(cycle);
+        twice.addAll(cycle);
+        assertEquals(twice, ids(moves(create(bossId(2), 2), 12)));
+    }
+
+    @Test
+    void zoChiffresDeSesAttaques() {
+        List<EnemyMove> moves = moves(create(bossId(2), 2), 6);
+        assertEquals(List.of(Hit.of(8)), moves.get(0).effects());                              // Coup de teub
+        assertEquals(List.of(Hit.of(5), new MoveEffect.Drink(1)), moves.get(2).effects());     // P'tit verre
+        assertEquals(List.of(new MoveEffect.HealSelf(10)), moves.get(4).effects());            // P'tite clope
+        assertEquals(List.of(Hit.of(12)), moves.get(5).effects());                             // Capoeira
+    }
+
+    @Test
+    void nortinRepeteUnCycleDeQuatreTours() {
+        assertEquals(List.of("bitchslap", "dodge", "vol-trinket", "kicknuts",
+                        "bitchslap", "dodge", "vol-trinket", "kicknuts"),
+                ids(moves(create(bossId(1), 1), 8)));
+    }
+
+    @Test
+    void nortinDegatsDeSesCoups() {
+        List<EnemyMove> moves = moves(create(bossId(1), 1), 4);
+        assertEquals(8, damage(moves.get(0)), DELTA);  // Bitch slap
+        assertEquals(new MoveEffect.StealTrinket(0.2, 8), moves.get(2).effects().get(0)); // Vol de trinket
+        assertEquals(16, damage(moves.get(3)), DELTA); // Hit in the nuts
+    }
+
+    @Test
+    void nortinEsquiveSeptantepourcentSinonBitchSlap() {
+        EnemyMove dodge = moves(create(bossId(1), 1), 2).get(1);
+        assertEquals(new MoveEffect.Gamble(0.7, new MoveEffect.Dodge(), Hit.of(8)), dodge.effects().get(0));
     }
 
     @Test

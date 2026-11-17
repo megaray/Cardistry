@@ -35,6 +35,8 @@ class EnemyMoveTest {
     private static final double DELTA = 1e-9;
 
     private final List<GameEvent> events = new ArrayList<>();
+    /** Graine du moteur (changée par les tests qui cherchent un tirage précis). */
+    private long seed = 3;
     private GameState state;
     private CombatEngine engine;
     private Enemy enemy;
@@ -52,7 +54,7 @@ class EnemyMoveTest {
         bus.subscribe(events::add);
         enemy = builder.build();
         state = new GameState(new Player(100), List.of(enemy), new TerrainCard("Forêt", NATURE, cardistry.items.Rarity.COMMON), hand, new Stats());
-        engine = new CombatEngine(state, new CardPool(List.of(new TerrainCard("Pioche", FIRE, cardistry.items.Rarity.COMMON))), new Rng(3), bus,
+        engine = new CombatEngine(state, new CardPool(List.of(new TerrainCard("Pioche", FIRE, cardistry.items.Rarity.COMMON))), new Rng(seed), bus,
                 new LootTable(List::of));
     }
 
@@ -286,5 +288,411 @@ class EnemyMoveTest {
         assertEquals(100, state.player().hp(), DELTA);
         assertEquals(0, enemy.actions());
         assertSame(NORMAL, enemy.intent());
+    }
+
+    // --- Un dernier p'tit verre (Zo le StreMon) ---
+
+    private static final EnemyMove PTIT_VERRE = EnemyMove.of("ptit-verre", "Un dernier p'tit verre", "P'tit verre",
+            MoveEffect.Hit.of(5), new MoveEffect.Drink(1));
+
+    /** Deux adversaires : le combat contre le premier n'est pas le dernier (Gueule de bois possible). */
+    private void setUpDrinker() {
+        EventBus bus = new EventBus();
+        bus.subscribe(events::add);
+        enemy = Enemy.builder("zo", "Zo", NEUTRAL, EnemyRank.BOSS).hp(100)
+                .behavior(EnemyBehavior.always(PTIT_VERRE)).build();
+        Enemy next = Enemy.builder("suivant", "Suivant", NEUTRAL, EnemyRank.COMMON).hp(100)
+                .behavior(EnemyBehavior.always(NORMAL)).build();
+        state = new GameState(new Player(100), List.of(enemy, next),
+                new TerrainCard("Forêt", NATURE, cardistry.items.Rarity.COMMON), List.of(), new Stats());
+        engine = new CombatEngine(state, new CardPool(List.of(new TerrainCard("Pioche", FIRE, cardistry.items.Rarity.COMMON))),
+                new Rng(seed), bus, new LootTable(List::of));
+    }
+
+    @Test
+    void boissonNEstPasUneAttaqueMaisLeVerreEnEstUne() {
+        assertFalse(new MoveEffect.Drink(1).isAttack());
+        assertTrue(PTIT_VERRE.isAttack()); // à cause du coup de 5
+    }
+
+    @Test
+    void ptitVerreDonneUneIvresse() {
+        setUpDrinker();
+        endTurn();
+        assertEquals(1, state.drunkenness());
+        assertEquals(DrunkTier.TIPSY, state.drunkTier());
+        assertTrue(events.contains(new GameEvent.DrunkennessChanged(1, state.hangoverThreshold())));
+    }
+
+    @Test
+    void ptitVerreFrappeDeCinqPuisFaitBoire() {
+        setUpDrinker();
+        events.clear();
+        endTurn();
+        assertEquals(95, state.player().hp(), DELTA);
+        int hit = indexOf(GameEvent.EnemyAttacked.class);
+        int drink = indexOf(GameEvent.DrunkennessChanged.class);
+        assertTrue(hit >= 0 && drink > hit, "le coup avant l'Ivresse");
+    }
+
+    @Test
+    void ptitVerreDegatsMultipliesParLeNiveau() {
+        setUp(Enemy.builder("zo", "Zo", NEUTRAL, EnemyRank.BOSS).hp(100).scale(1.0, 1.25)
+                .behavior(EnemyBehavior.always(PTIT_VERRE)), List.of());
+        double expected = state.hitDamage(MoveEffect.Hit.of(5)); // 5 × 1,25 (arrondi des PV entiers)
+        assertTrue(expected > 5);
+        endTurn();
+        assertEquals(100 - expected, state.player().hp(), DELTA);
+        assertEquals(1, state.drunkenness());
+    }
+
+    @Test
+    void moscowMuleAnnuleLeCoupPasLIvresse() {
+        setUpDrinker();
+        giveMoscowMule(); // le Moscow Mule est lui-même une boisson : Ivresse 1
+        assertEquals(1, state.drunkenness());
+        endTurn();
+        assertEquals(100, state.player().hp(), DELTA);
+        assertEquals(1, events.stream().filter(e -> e instanceof GameEvent.AttackCancelled).count());
+        assertEquals(2, state.drunkenness());
+    }
+
+    @Test
+    void ptitVerreAuSeuilProgrammeUneGueuleDeBois() {
+        setUpDrinker();
+        state.setDrunkenness(state.hangoverThreshold() - 1);
+        assertEquals(0, state.pendingIntensity(Curse.HANGOVER));
+        endTurn();
+        assertEquals(state.hangoverThreshold(), state.drunkenness());
+        assertEquals(1, state.pendingIntensity(Curse.HANGOVER));
+        assertTrue(events.contains(new GameEvent.CurseGained(Curse.HANGOVER)));
+    }
+
+    @Test
+    void ptitVerreIntent() {
+        setUpDrinker();
+        assertEquals("5, +1 Ivresse pour toi", cardistry.ui.IntentText.effects(state, PTIT_VERRE));
+    }
+
+    // --- Vol de trinket (Nortin) ---
+
+    @Test
+    void volDeTrinketCompteCommeUneAttaque() {
+        MoveEffect steal = new MoveEffect.StealTrinket(0.2, 8);
+        assertTrue(steal.isAttack());
+        assertTrue(EnemyMove.of("vol-trinket", "Vol de trinket", "Vol de trinket", steal).isAttack());
+    }
+
+    @Test
+    void volDeTrinketIntentAvecChanceEtCoupSansTrinket() {
+        MoveEffect steal = new MoveEffect.StealTrinket(0.2, 8);
+        setUp(always(steal), List.of());
+        assertEquals("20 % de te voler un trinket, sans trinket : 8",
+                cardistry.ui.IntentText.effects(state, EnemyMove.of("vol-trinket", "Vol de trinket", "Vol de trinket", steal)));
+    }
+
+    @Test
+    void journalDuVolDeTrinket() {
+        Enemy nortin = cardistry.model.enemy.EnemyRegistry.create(cardistry.model.enemy.EnemyRegistry.bossId(1), 1);
+        assertEquals("Nortin te vole Diplôme EPFL !", cardistry.ui.IntentText.journal(
+                new GameEvent.TrinketStolen(nortin, ItemRegistry.trinket("diplome-epfl"))));
+    }
+
+    @Test
+    void journalDuTrinketRendu() {
+        assertEquals("Tu récupères Diplôme EPFL", cardistry.ui.IntentText.journal(
+                new GameEvent.TrinketReturned(ItemRegistry.trinket("diplome-epfl"))));
+    }
+
+    // --- Vol de trinket : exécution ---
+
+    private static cardistry.items.Trinket plainTrinket(String id, cardistry.items.Tag... tags) {
+        return cardistry.items.Trinket.builder(id, id, cardistry.items.Rarity.COMMON).tags(tags).build();
+    }
+
+    /** Adversaire qui tente toujours un vol de trinket ({@code chance}, coup de 8 sans trinket). */
+    private void setUpThief(double chance) {
+        setUp(always(new MoveEffect.StealTrinket(chance, 8)), List.of());
+    }
+
+    private void equipPlain(int count) {
+        for (int i = 0; i < count; i++) {
+            engine.equip(plainTrinket("t" + i));
+        }
+    }
+
+    private long stolenEvents() {
+        return events.stream().filter(e -> e instanceof GameEvent.TrinketStolen).count();
+    }
+
+    @Test
+    void volReussiPrendUnTrinketEtLAnnonce() {
+        setUpThief(1.0);
+        equipPlain(3);
+        List<cardistry.items.Trinket> before = List.copyOf(state.trinkets());
+        endTurn();
+        assertEquals(2, state.trinkets().size());
+        assertEquals(1, state.stolenTrinkets().size());
+        cardistry.items.Trinket stolen = state.stolenTrinkets().get(0);
+        assertTrue(before.contains(stolen));
+        assertTrue(events.contains(new GameEvent.TrinketStolen(enemy, stolen)));
+        assertEquals(100, state.player().hp(), DELTA);
+    }
+
+    @Test
+    void volRateNeFaitRien() {
+        setUpThief(0.0);
+        equipPlain(3);
+        endTurn();
+        assertEquals(3, state.trinkets().size());
+        assertTrue(state.stolenTrinkets().isEmpty());
+        assertEquals(0, stolenEvents());
+        assertEquals(100, state.player().hp(), DELTA);
+    }
+
+    @Test
+    void volSansTrinketDonneUnCoup() {
+        setUpThief(1.0);
+        endTurn();
+        assertEquals(92, state.player().hp(), DELTA);
+        assertTrue(state.stolenTrinkets().isEmpty());
+        assertEquals(0, stolenEvents());
+    }
+
+    @Test
+    void volBloqueParMoscowMuleQuiEstConsomme() {
+        setUpThief(1.0);
+        equipPlain(3);
+        giveMoscowMule();
+        endTurn();
+        assertEquals(3, state.trinkets().size());
+        assertTrue(state.stolenTrinkets().isEmpty());
+        assertEquals(1, events.stream().filter(e -> e instanceof GameEvent.AttackCancelled).count());
+        assertTrue(state.effects().isEmpty());
+    }
+
+    @Test
+    void moscowMuleConsommeMemeSiLeVolAuraitRate() {
+        setUpThief(0.0);
+        equipPlain(3);
+        giveMoscowMule();
+        endTurn();
+        assertTrue(state.effects().isEmpty());
+        assertEquals(1, events.stream().filter(e -> e instanceof GameEvent.AttackCancelled).count());
+    }
+
+    @Test
+    void volBloqueParLImmuniteDeFons() {
+        setUpThief(1.0);
+        equipPlain(3);
+        boolean[] landed = new boolean[1];
+        engine.give(new cardistry.items.Item("fons", "Fons", "", "", cardistry.items.Rarity.COMMON, java.util.Set.of(),
+                ctx -> landed[0] = ctx.applyStatus(cardistry.core.status.StatusTarget.PLAYER,
+                        cardistry.core.status.StatusType.FONS, 1, 2, new cardistry.core.status.StatusExtras(0.08, true))));
+        engine.submit(new Action.UseItem(state.items().size() - 1));
+        assertTrue(landed[0]);
+        endTurn();
+        assertEquals(3, state.trinkets().size());
+        assertTrue(state.stolenTrinkets().isEmpty());
+        assertTrue(events.stream().anyMatch(e -> e instanceof GameEvent.AttackCancelled));
+    }
+
+    /** Diplôme EPFL + 5 trinkets, puis un vol réussi ; renvoie {@code true} si le Diplôme a été volé. */
+    private boolean stealWithDiplomaAndFiveOthers(long engineSeed) {
+        seed = engineSeed;
+        events.clear();
+        setUpThief(1.0);
+        engine.equip(ItemRegistry.trinket("diplome-epfl"));
+        equipPlain(5);
+        assertEquals(6, state.trinkets().size());
+        endTurn();
+        return state.stolenTrinkets().stream().anyMatch(t -> t.id().equals("diplome-epfl"));
+    }
+
+    @Test
+    void diplomeVoleAvecSixTrinketsSeulLeDiplomePart() {
+        long s = 0;
+        while (!stealWithDiplomaAndFiveOthers(s)) {
+            assertTrue(++s < 500, "aucune graine ne vole le Diplôme");
+        }
+        // Le Diplôme libère sa propre place : 5 trinkets pour 5 emplacements, rien à jeter.
+        assertEquals(1, state.stolenTrinkets().size());
+        assertEquals(5, state.trinkets().size());
+        assertEquals(5, state.trinketSlots());
+        assertEquals(1, stolenEvents());
+        assertFalse(events.stream().anyMatch(e -> e instanceof GameEvent.TrinketDiscarded));
+    }
+
+    @Test
+    void autreTrinketVoleAvecLeDiplomeUnSeulPart() {
+        long s = 0;
+        while (stealWithDiplomaAndFiveOthers(s)) {
+            assertTrue(++s < 500, "aucune graine ne vole un autre trinket que le Diplôme");
+        }
+        assertEquals(1, state.stolenTrinkets().size());
+        assertEquals(5, state.trinkets().size());
+        assertEquals(6, state.trinketSlots());
+        assertEquals(1, stolenEvents());
+    }
+
+    @Test
+    void volRecalculeLesBonusDeSet() {
+        setUpThief(1.0);
+        engine.equip(plainTrinket("a", cardistry.items.Tag.EPFL));
+        engine.equip(plainTrinket("b", cardistry.items.Tag.EPFL));
+        assertFalse(state.activeSetTiers().isEmpty());
+        endTurn();
+        assertTrue(state.activeSetTiers().isEmpty());
+        assertTrue(events.stream().anyMatch(e -> e instanceof GameEvent.SetTierDeactivated));
+    }
+
+    // --- Vol de trinket : rendu à la mort du voleur ---
+
+    private static final MoveEffect SURE_STEAL = new MoveEffect.StealTrinket(1.0, 8);
+
+    /**
+     * Voleur de 100 PV suivi d'un 2e adversaire (pas le dernier combat : il y a une récompense) ;
+     * main : un sort qui tue en un coup ; la récompense propose {@code loot}.
+     */
+    private void setUpThiefFight(EnemyBehavior behavior, List<cardistry.items.Collectible> loot) {
+        EventBus bus = new EventBus();
+        bus.subscribe(events::add);
+        enemy = Enemy.builder("voleur", "Voleur", NEUTRAL, EnemyRank.COMMON).hp(100).behavior(behavior).build();
+        Enemy next = Enemy.builder("suivant", "Suivant", NEUTRAL, EnemyRank.COMMON).hp(100)
+                .behavior(always(MoveEffect.Hit.of(1))).build();
+        state = new GameState(new Player(100), List.of(enemy, next), new TerrainCard("Forêt", NATURE, cardistry.items.Rarity.COMMON),
+                List.of(new SpellCard("Fatal", FIRE, 1000, cardistry.items.Rarity.COMMON)), new Stats());
+        engine = new CombatEngine(state, new CardPool(List.of(new TerrainCard("Pioche", FIRE, cardistry.items.Rarity.COMMON))), new Rng(seed), bus,
+                new LootTable(() -> loot));
+    }
+
+    private void setUpThiefFight() {
+        setUpThiefFight(always(SURE_STEAL), List.of());
+    }
+
+    /** Joue le sort fatal (premier de la main). */
+    private void killThief() {
+        engine.submit(new Action.PlayCard(0));
+        assertFalse(enemy.isAlive());
+    }
+
+    private List<cardistry.items.Trinket> returnedEvents() {
+        return events.stream().filter(e -> e instanceof GameEvent.TrinketReturned)
+                .map(e -> ((GameEvent.TrinketReturned) e).trinket()).toList();
+    }
+
+    private int indexOf(Class<? extends GameEvent> type) {
+        for (int i = 0; i < events.size(); i++) {
+            if (type.isInstance(events.get(i))) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    @Test
+    void leTrinketVoleRevientALaMortDuVoleurAvantLaMort() {
+        setUpThiefFight();
+        equipPlain(3);
+        endTurn();
+        cardistry.items.Trinket stolen = state.stolenTrinkets().get(0);
+
+        killThief();
+
+        assertEquals(3, state.trinkets().size());
+        assertEquals(stolen, state.trinkets().get(2));
+        assertTrue(state.stolenTrinkets().isEmpty());
+        assertEquals(List.of(stolen), returnedEvents());
+        assertTrue(indexOf(GameEvent.TrinketReturned.class) < indexOf(GameEvent.EnemyKilled.class),
+                "rendu avant EnemyKilled");
+    }
+
+    @Test
+    void plusieursVolsPlusieursRendusDansLOrdreDuVol() {
+        setUpThiefFight();
+        equipPlain(3);
+        endTurn();
+        endTurn();
+        List<cardistry.items.Trinket> stolen = List.copyOf(state.stolenTrinkets());
+        assertEquals(2, stolen.size());
+
+        killThief();
+
+        assertEquals(stolen, returnedEvents());
+        assertEquals(stolen, state.trinkets().subList(1, 3));
+    }
+
+    @Test
+    void mondeSnackRenduSoigneALaMortDuVoleur() {
+        setUpThiefFight();
+        engine.equip(ItemRegistry.trinket("monde-snack"));
+        state.player().takeDamage(30);
+        endTurn();
+        assertEquals("monde-snack", state.stolenTrinkets().get(0).id());
+        assertEquals(70, state.player().hp(), DELTA);
+
+        killThief();
+
+        assertEquals(80, state.player().hp(), DELTA);
+    }
+
+    @Test
+    void unTrinketRenduRallumeLeSet() {
+        setUpThiefFight();
+        engine.equip(plainTrinket("a", cardistry.items.Tag.EPFL));
+        engine.equip(plainTrinket("b", cardistry.items.Tag.EPFL));
+        endTurn();
+        assertTrue(state.activeSetTiers().isEmpty());
+        events.clear();
+
+        killThief();
+
+        assertFalse(state.activeSetTiers().isEmpty());
+        assertTrue(events.stream().anyMatch(e -> e instanceof GameEvent.SetTierActivated));
+    }
+
+    @Test
+    void unTrinketRenduNEstPasProposeEnRecompense() {
+        cardistry.items.Trinket x = plainTrinket("x");
+        cardistry.items.Trinket y = plainTrinket("y");
+        setUpThiefFight(always(SURE_STEAL), List.of(x, y));
+        engine.equip(x);
+        endTurn();
+        assertEquals(List.of(x), state.stolenTrinkets());
+
+        killThief();
+
+        assertTrue(engine.hasPendingReward());
+        assertFalse(engine.pendingReward().contains(x));
+        assertTrue(engine.pendingReward().contains(y));
+    }
+
+    @Test
+    void surUneDefaiteLeTrinketResteVole() {
+        EnemyMove steal = EnemyMove.of("vol", "Vol", "Vol", SURE_STEAL);
+        EnemyMove kill = EnemyMove.of("coup", "Coup", "Coup", MoveEffect.Hit.of(1000));
+        setUpThiefFight(self -> self.actions() == 0 ? steal : kill, List.of());
+        equipPlain(3);
+        endTurn();
+        assertEquals(1, state.stolenTrinkets().size());
+
+        engine.submit(new Action.RollCigarette());
+
+        assertTrue(state.isLost());
+        assertEquals(1, state.stolenTrinkets().size());
+        assertTrue(returnedEvents().isEmpty());
+    }
+
+    @Test
+    void sansVolRienNEstRenduALaMort() {
+        setUpThiefFight(always(new MoveEffect.StealTrinket(0.0, 8)), List.of());
+        equipPlain(3);
+        List<cardistry.items.Trinket> before = List.copyOf(state.trinkets());
+        endTurn();
+
+        killThief();
+
+        assertTrue(returnedEvents().isEmpty());
+        assertEquals(before, state.trinkets());
     }
 }
