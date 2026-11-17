@@ -198,6 +198,7 @@ public final class Main {
         }
         Log.info("Nouvelle partie : seed " + run.seed() + ", secrets débloqués " + unlocked
                 + (isNullSeed(options) ? ", code NullPointerException" : ""));
+        bus.subscribe(new cardistry.ui.EventLog()); // chaque événement, avec --debug
         UnlockTracker tracker = new UnlockTracker(run::state, store, bus);
         bus.subscribe(tracker);
         return new Game(run, tracker, bus);
