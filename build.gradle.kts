@@ -55,8 +55,9 @@ tasks.test {
     if (project.hasProperty("trace")) {
         systemProperty("trace", "true")
     }
-    // Les tests ne jouent jamais de son.
+    // Les tests ne jouent jamais de son et n'écrivent pas de debug.log.
     systemProperty("cardistry.audio", "off")
+    systemProperty("cardistry.log", "off")
 }
 
 // ===================== Art (Aseprite) =====================
@@ -184,6 +185,7 @@ val balanceRun by tasks.registering(JavaExec::class) {
     mainClass = "cardistry.tools.BalanceRun"
     dependsOn("testClasses")
     systemProperty("cardistry.audio", "off")
+    systemProperty("cardistry.log", "off")
     systemProperty("java.awt.headless", "true")
     if (project.hasProperty("trace")) {
         systemProperty("trace", "true")

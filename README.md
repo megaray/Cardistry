@@ -74,8 +74,8 @@ icônes, carte (voir « Interface de la fenêtre »).
 
 - Écran titre : **Jouer**, **Règles**, **Options**, **Quitter** (↑/↓ ou ←/→, Entrée ; R et Q en raccourci).
 - Puis le **choix du personnage** (←/→ ou 1-3, Entrée ; Échap revient au titre) : **Louis** (MAN : premier
-  sort de chaque combat +50 %, Gueule de bois doublée), **Dave** (Full skill Mr. Le Juge : un sort du
-  terrain qui bat l'adversaire le soigne des PV enlevés), **Sassy** (wadayatalkinabit : 130 PV, un alien
+  sort de chaque combat +50 %, Gueule de bois doublée), **Dave** (Full skill Mr. Le Juge : un sort de
+  l'élément du terrain le soigne des PV enlevés), **Sassy** (wadayatalkinabit : 130 PV, un alien
   inflige 4 dégâts à chaque tour, sauf quand il fume un joint).
 - En jeu, **Échap** ouvre le menu **pause** (Reprendre, Options, Quitter la partie) sur la carte, en combat, à la
   Sieste, dans un événement et sur les écrans de récompense. Dans un sous-écran (remplacer un objet,
@@ -114,8 +114,38 @@ quitte le jeu (les déblocages sont déjà sauvegardés).
 | `--ascii` | ASCII pur (cadres `+-|`, barres `#`, accents retirés) |
 | `--no-color` | mode texte sans couleurs ANSI |
 | `--window` | ancien nom de la fenêtre (c'est le mode par défaut) |
+| `--debug` | journal détaillé (chaque événement du jeu) et console de développement (F12) |
 
 Exemples : `./play --seed 42 --crt`, `./play --terminal`, `play.bat --no-ui --no-color`.
+
+### Journal de débogage
+
+`debug.log` est écrit dans le dossier de sauvegarde (Linux `~/.local/share/cardistry`, macOS
+`~/Library/Application Support/Cardistry`, Windows `%APPDATA%\Cardistry`) ; celui du lancement
+précédent est gardé en `debug.1.log`. Par défaut : démarrage, seed, erreurs et plantages (avec la
+pile) ; avec `--debug` : tous les événements du jeu. Dans le code : `Log.debug / info / warn / error`
+(`cardistry.utils.Log`), le fichier et la ligne de l'appelant sont ajoutés tout seuls. Les tests
+n'écrivent aucun fichier (`-Dcardistry.log=off`).
+
+### Console de développement
+
+Avec `--debug` (fenêtre et `--terminal`), **F12** ouvre sur n'importe quel écran un panneau en bas :
+le journal en direct et une ligne de commande. Entrée exécute, ↑/↓ rappellent les commandes, Tab
+change le niveau affiché, PgUp/PgDn font défiler, Échap ou F12 ferment. `help` liste les commandes :
+
+| Commande | Effet |
+|---|---|
+| `hp <n>` / `ehp <n>` / `kill` | PV du joueur / de l'adversaire / adversaire à 1 PV |
+| `choomies <n>`, `cigs <n>`, `drunk <n>` | Choomies, clopes, Ivresse |
+| `card <nom>` / `deck <nom>` | carte dans la main / le deck (casse et accents ignorés) |
+| `item <id>` / `trinket <id>` | objet / trinket (s'il reste un emplacement) |
+| `status <id> <tours> [joueur]` | statut sur l'adversaire (ou le joueur), sans tirage |
+| `stat <FOR…CHA> <n>` | bonus plat (source « console » sur la fiche C) |
+| `list cards\|items\|trinkets\|status` | identifiants utilisables |
+| `state`, `seed`, `level <niveau>`, `clear` | résumé de la partie, seed, niveau du journal, vider |
+
+Les triches sont gardées dans l'historique de la partie : Ctrl+Z les rejoue. Les secrets se
+débloquent normalement. Nouvelle commande : une ligne `add(…)` dans `cardistry.ui.DevCommands`.
 
 ## Particularités par OS
 

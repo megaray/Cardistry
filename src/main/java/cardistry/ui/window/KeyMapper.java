@@ -30,6 +30,9 @@ public final class KeyMapper {
             case KeyEvent.VK_DELETE -> KeyType.Delete;
             case KeyEvent.VK_HOME -> KeyType.Home;
             case KeyEvent.VK_END -> KeyType.End;
+            case KeyEvent.VK_PAGE_UP -> KeyType.PageUp;
+            case KeyEvent.VK_PAGE_DOWN -> KeyType.PageDown;
+            case KeyEvent.VK_F12 -> KeyType.F12; // console de développement (--debug)
             default -> null;
         };
         if (type != null) {

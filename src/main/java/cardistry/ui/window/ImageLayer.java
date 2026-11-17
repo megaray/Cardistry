@@ -74,6 +74,19 @@ public final class ImageLayer {
         drawingMarks.add(mark);
     }
 
+    /**
+     * Retire du calque en cours ce qui déborde sur les lignes {@code row} et suivantes : un panneau
+     * de texte dessiné là (console de développement) n'est pas recouvert par les images.
+     */
+    public synchronized void hideFrom(int row) {
+        drawing.removeIf(p -> p.row() + p.rows() > row);
+        int limit = row * UNITS_PER_ROW;
+        drawingMarks.removeIf(m -> switch (m) {
+            case Fill f -> f.y() + f.height() > limit;
+            case Stamp s -> s.y() + (s.size() + 1) / 2 > limit;
+        });
+    }
+
     public synchronized void commit() {
         committed = new Frame(List.copyOf(drawing), List.copyOf(drawingMarks));
     }

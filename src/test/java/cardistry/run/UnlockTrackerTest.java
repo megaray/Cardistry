@@ -188,6 +188,7 @@ class UnlockTrackerTest {
                 case EVENT -> run.chooseStory(run.story().orElseThrow().choices().size() - 1);
                 case REST -> run.rest(RestOption.HEAL);
                 case STAT_POINTS -> run.spendStatPoint(cardistry.core.stats.StatType.STRENGTH);
+                case ALTAR -> run.leaveAltar();
                 case OVER -> throw new AssertionError("partie finie trop tôt");
             }
         }

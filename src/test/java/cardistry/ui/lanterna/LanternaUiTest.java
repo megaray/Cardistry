@@ -1969,4 +1969,56 @@ class LanternaUiTest {
         assertEquals(List.of(cardistry.ui.audio.UiSound.CURSOR, cardistry.ui.audio.UiSound.BACK,
                 cardistry.ui.audio.UiSound.BACK, cardistry.ui.audio.UiSound.CONFIRM), played);
     }
+
+    // --- Console de développement ---
+
+    @Test
+    void consoleDeDevF12AfficheLeJournalEtExecute() throws Exception {
+        cardistry.utils.Log.clearMemory();
+        open(80, 24);
+        Run run = new Run(5, java.util.Set.of(), new EventBus());
+        run.start();
+        ui.enableDevConsole();
+        ui.attachDevRun(run);
+        press(KeyType.F12);
+        type("seed");
+        press(KeyType.Enter);
+        type("vole");
+        press(KeyType.Enter);
+        type("hp 7");
+        press(KeyType.Enter);
+        java.util.concurrent.atomic.AtomicReference<cardistry.ui.TitleChoice> choice =
+                new java.util.concurrent.atomic.AtomicReference<>();
+        Thread title = new Thread(() -> choice.set(ui.title(42)));
+        title.setDaemon(true);
+        title.start();
+        long end = System.currentTimeMillis() + TIMEOUT.toMillis();
+        while (!screen().contains("PV du joueur : 7") && System.currentTimeMillis() < end) {
+            Thread.sleep(20);
+        }
+        String text = dump("90-console-dev");
+        assertTrue(text.contains("CONSOLE DE DEV"), text);
+        assertTrue(text.contains("> seed") && text.contains("Seed : 5"), text);
+        assertTrue(text.contains("Commande inconnue : vole"), text);
+        assertTrue(text.contains("> _"), text);
+        assertTrue(text.contains("Seed 42"), text); // l'écran du dessous reste visible en haut
+        assertEquals(7, run.state().player().hp());
+
+        press(KeyType.Escape); // ferme la console : les touches reviennent au titre
+        press(KeyType.Enter);
+        title.join(TIMEOUT.toMillis());
+        assertFalse(title.isAlive());
+        assertFalse(choice.get().showRules());
+        assertFalse(screen().contains("CONSOLE DE DEV"));
+        cardistry.utils.Log.clearMemory();
+    }
+
+    @Test
+    void sansDebugF12NeFaitRien() throws IOException {
+        open(80, 24);
+        press(KeyType.F12);
+        press(KeyType.Enter);
+        assertFalse(assertTimeoutPreemptively(TIMEOUT, () -> ui.title(42)).showRules());
+        assertFalse(screen().contains("CONSOLE DE DEV"));
+    }
 }

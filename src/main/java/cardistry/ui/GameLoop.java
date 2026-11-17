@@ -5,6 +5,7 @@ import cardistry.core.ActionResult;
 import cardistry.run.Run;
 import cardistry.run.Secret;
 import cardistry.run.map.MapView;
+import cardistry.utils.Log;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -42,12 +43,20 @@ public final class GameLoop {
         } while (hero.isEmpty());
         run.setHero(hero.get());
         title.codes().forEach(run::addCode);
+        Log.info("Partie lancée : seed " + run.seed() + ", personnage " + hero.get().name()
+                + (title.codes().isEmpty() ? "" : ", codes " + title.codes()));
         run.setDecisions(input);
         run.start();
         if (title.showRules()) {
             renderer.showIntro(run.state());
         }
+        Run.Phase previous = null;
         while (!run.isOver()) {
+            if (run.phase() != previous) {
+                previous = run.phase();
+                Log.info("Phase " + previous + " (niveau " + run.state().level() + ", PV "
+                        + run.state().player().hp() + ")");
+            }
             if (audio != null) {
                 audio.phase(run.phase(), run.state());
             }
@@ -72,6 +81,8 @@ public final class GameLoop {
         if (audio != null) {
             audio.phase(Run.Phase.OVER, run.state());
         }
+        Log.info("Fin de partie : " + (run.state().player().isAlive() ? "victoire" : "défaite")
+                + ", niveau " + run.state().level() + ", seed " + run.seed());
         renderer.showGameOver(run.state(), unlockedThisRun.get().stream().map(Secret::displayName).toList());
         input.waitForExit();
     }
@@ -81,6 +92,7 @@ public final class GameLoop {
         renderer.showMap(view);
         int index = input.chooseNode(view);
         if (index >= 0 && index < view.choices().size()) {
+            Log.debug("Nœud choisi : " + view.choices().get(index));
             run.chooseNode(index);
         }
     }

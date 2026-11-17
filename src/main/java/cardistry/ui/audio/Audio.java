@@ -1,5 +1,6 @@
 package cardistry.ui.audio;
 
+import cardistry.utils.Log;
 /**
  * Le son du jeu, piloté par l'interface et l'{@link AudioDirector} (jamais par la logique).
  * {@link #silent()} : aucune sortie (tests, CI, pas de carte son, {@code cardistry.audio=off}).
@@ -47,6 +48,7 @@ public interface Audio extends AutoCloseable {
      */
     static Audio open(int music, int effects, boolean muted, boolean mute, boolean noMusic) {
         if (mute || "off".equalsIgnoreCase(System.getProperty("cardistry.audio", "on"))) {
+            Log.info("Son coupé (--mute ou cardistry.audio=off)");
             return silent();
         }
         return SoftwareAudio.start(SoundTable.load(), music, effects, muted, noMusic).orElseGet(Audio::silent);

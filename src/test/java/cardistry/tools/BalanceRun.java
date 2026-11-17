@@ -133,6 +133,7 @@ public final class BalanceRun {
                 }
                 case SHOP -> run.shop(bot.shop(run.state(), run.shop().orElseThrow()));
                 case STAT_POINTS -> run.spendStatPoint(bot.statPoint(run.state()));
+                case ALTAR -> run.leaveAltar();
                 case OVER -> {
                 }
             }

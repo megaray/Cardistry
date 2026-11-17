@@ -138,16 +138,16 @@ class HeroTest {
     // --- Dave : Full skill Mr. Le Juge ---
 
     @Test
-    void daveSortDuTerrainQuiBatLAdversaireSoigneDesPvEnleves() {
-        // Boule de feu sur un terrain feu contre un adversaire plante : (10 + FOR 1) × 1.5 = 16.5 → 17 dégâts,
-        // 17 PV rendus (soin sans ESP : ce n'est ni une carte ni un objet).
+    void daveSortDuTerrainSoigneDesPvEnleves() {
+        // Boule de feu sur un terrain feu contre un adversaire plante : (10 + FOR 2) × 1.5 = 18 dégâts,
+        // 18 PV rendus (soin sans ESP : ce n'est ni une carte ni un objet).
         setUp(HeroRegistry.DAVE, 1, FIRE, List.of(spell(FIRE, 10)), enemy(NATURE, 500));
         noCrit();
         state.player().takeDamage(50);
         engine.startTurn();
         engine.submit(new Action.PlayCard(0));
-        assertEquals(17, damageToEnemy(), DELTA);
-        assertEquals(17, healed(), DELTA);
+        assertEquals(18, damageToEnemy(), DELTA);
+        assertEquals(18, healed(), DELTA);
     }
 
     @Test
@@ -169,12 +169,15 @@ class HeroTest {
     }
 
     @Test
-    void daveRienSiLeSortNeBatPasLAdversaire() {
+    void daveSoigneMemeSiLeSortNeBatPasLAdversaire() {
+        // Feu contre feu : (10 + FOR 2) × 1 = 12 dégâts, 12 PV rendus.
         setUp(HeroRegistry.DAVE, 1, FIRE, List.of(spell(FIRE, 10)), enemy(FIRE, 500));
+        noCrit();
         state.player().takeDamage(50);
         engine.startTurn();
         engine.submit(new Action.PlayCard(0));
-        assertEquals(0, healed(), DELTA);
+        assertEquals(12, damageToEnemy(), DELTA);
+        assertEquals(12, healed(), DELTA);
     }
 
     @Test
@@ -229,7 +232,7 @@ class HeroTest {
         noCrit();
         engine.startTurn();
         engine.submit(new Action.PlayCard(0));
-        assertEquals(4 + 11, damageToEnemy(), DELTA, "alien brut + (10 + FOR 1)");
+        assertEquals(4 + 12, damageToEnemy(), DELTA, "alien brut + (10 + FOR 2)");
     }
 
     @Test
@@ -247,8 +250,8 @@ class HeroTest {
     void statsDeBaseDesPersonnages() {
         java.util.Map<Hero, int[]> expected = java.util.Map.of(
                 HeroRegistry.LOUIS, new int[] {3, 2, 0, 1, 1, 1},
-                HeroRegistry.DAVE, new int[] {1, 3, 1, 1, 1, 1},
-                HeroRegistry.SASSY, new int[] {1, 0, 2, 2, 2, 1},
+                HeroRegistry.DAVE, new int[] {2, 3, 1, 1, 1, 1},
+                HeroRegistry.SASSY, new int[] {2, 0, 2, 2, 2, 1},
                 HeroRegistry.FREDERIC, new int[] {2, 2, 2, 2, 2, 2});
         expected.forEach((hero, values) -> {
             GameState game = GameState.newGame(hero);
@@ -257,7 +260,8 @@ class HeroTest {
                 assertEquals(values[i], game.playerStats().get(types.get(i)), DELTA, hero.name() + " " + types.get(i));
             }
             int total = java.util.Arrays.stream(values).sum();
-            assertEquals(hero == HeroRegistry.FREDERIC ? 12 : 8, total, hero.name());
+            int points = hero == HeroRegistry.FREDERIC ? 12 : hero == HeroRegistry.LOUIS ? 8 : 9;
+            assertEquals(points, total, hero.name());
         });
     }
 

@@ -53,6 +53,8 @@ public final class LanternaUi implements Renderer, Input, AutoCloseable {
 
     private Page page = Page.TITLE;
     private GameState state;
+    /** Console de développement (F12) ; {@code null} sans {@code --debug}. */
+    private DevOverlay dev;
     private long seed;
     private List<Collectible> rewardOptions = List.of();
     private int rewardSelected = 0;
@@ -1713,6 +1715,20 @@ public final class LanternaUi implements Renderer, Input, AutoCloseable {
 
     // ===================== Écran et clavier =====================
 
+    /** Active la console de développement (F12), lancée avec {@code --debug}. */
+    public void enableDevConsole() {
+        if (dev == null) {
+            dev = new DevOverlay();
+        }
+    }
+
+    /** Partie visée par les commandes de la console (sans effet si elle n'est pas activée). */
+    public void attachDevRun(cardistry.run.Run run) {
+        if (dev != null) {
+            dev.attach(run);
+        }
+    }
+
     private void render() {
         try {
             screen.doResizeIfNecessary();
@@ -1769,6 +1785,9 @@ public final class LanternaUi implements Renderer, Input, AutoCloseable {
                     painter.text(2, size.getRows() - 1, " Quitter la partie et revenir au titre ? [O]ui / [N]on ", Palette.WARNING, true);
                 }
             }
+            if (dev != null && dev.isOpen()) {
+                dev.draw(painter);
+            }
             if (images != null) {
                 images.commit(); // avant refresh : la fenêtre lit le calque au flush
             }
@@ -1800,6 +1819,15 @@ public final class LanternaUi implements Renderer, Input, AutoCloseable {
                     if (key.getKeyType() == KeyType.EOF) {
                         throw new QuitGameException();
                     }
+                    if (dev != null && (DevOverlay.isToggle(key) || dev.isOpen())) {
+                        if (DevOverlay.isToggle(key)) {
+                            dev.toggle(); // n'importe où : la console, puis retour à l'écran en cours
+                        } else {
+                            dev.handle(key);
+                        }
+                        render();
+                        continue;
+                    }
                     keySound(key);
                     view.pageTick = 0; // une touche : les textes longs reprennent au début
                     if (opensDeck(key)) {
@@ -1817,8 +1845,8 @@ public final class LanternaUi implements Renderer, Input, AutoCloseable {
                     }
                     return key;
                 }
-                if (screen.doResizeIfNecessary() != null) {
-                    render();
+                if (screen.doResizeIfNecessary() != null || dev != null && dev.needsRedraw()) {
+                    render(); // nouvelle ligne du journal : la console suit en direct
                 }
                 if (!fast && PAGED_PAGES.contains(page) && System.currentTimeMillis() >= nextPage) {
                     view.pageTick++; // descriptions trop longues : page suivante

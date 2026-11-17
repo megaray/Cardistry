@@ -1,5 +1,6 @@
 package cardistry.ui.audio;
 
+import cardistry.utils.Log;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +46,7 @@ final class SoftwareAudio implements Audio {
             line.open(FORMAT, BLOCK_FRAMES * 4 * 4);
             line.start();
         } catch (LineUnavailableException | IllegalArgumentException | SecurityException e) {
+            Log.warn("Pas de sortie audio : jeu muet", e);
             return Optional.empty();
         }
         SoftwareAudio audio = new SoftwareAudio(table, line, noMusic);
@@ -76,6 +78,7 @@ final class SoftwareAudio implements Audio {
             }
         } catch (RuntimeException e) {
             // Sortie audio perdue (périphérique débranché…) : on continue sans son.
+            Log.warn("Sortie audio perdue : suite sans son", e);
         } finally {
             line.close();
         }
