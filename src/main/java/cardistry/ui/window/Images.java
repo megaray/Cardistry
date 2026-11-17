@@ -1,5 +1,6 @@
 package cardistry.ui.window;
 
+import cardistry.utils.Log;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -139,6 +140,7 @@ public final class Images {
             }
             return Optional.ofNullable(ImageIO.read(in));
         } catch (IOException e) {
+            Log.warn("Image illisible : images/" + path, e);
             return Optional.empty();
         }
     }

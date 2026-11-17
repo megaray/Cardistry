@@ -1,5 +1,6 @@
 package cardistry.platform;
 
+import cardistry.utils.Log;
 import cardistry.ui.Settings;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -49,9 +50,11 @@ public final class SettingsFile {
             }
             lines = Files.readAllLines(file, StandardCharsets.UTF_8);
         } catch (IOException | UncheckedIOException | SecurityException e) {
+            Log.warn("Réglages illisibles (" + file + ") : valeurs par défaut", e);
             return settings;
         }
         if (lines.isEmpty() || !lines.get(0).strip().equals(HEADER)) {
+            Log.warn("Réglages sans en-tête (" + file + ") : valeurs par défaut");
             return settings;
         }
         for (String raw : lines.subList(1, lines.size())) {
@@ -69,7 +72,7 @@ public final class SettingsFile {
                     default -> settings;
                 };
             } catch (NumberFormatException e) {
-                // valeur illisible : on garde la valeur par défaut
+                Log.warn("Réglage illisible ignoré : " + raw.strip());
             }
         }
         return settings;
@@ -90,7 +93,7 @@ public final class SettingsFile {
                 Files.move(temp, file, StandardCopyOption.REPLACE_EXISTING);
             }
         } catch (IOException | SecurityException e) {
-            // Sauvegarde impossible : on joue quand même.
+            Log.warn("Sauvegarde des réglages impossible (" + file + ")", e); // on joue quand même
         } finally {
             if (temp != null) {
                 try {

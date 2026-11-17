@@ -1,5 +1,6 @@
 package cardistry.ui.audio;
 
+import cardistry.utils.Log;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -116,10 +117,12 @@ public final class Pcm {
     public static Optional<Pcm> load(String path) {
         try (InputStream raw = Pcm.class.getResourceAsStream("/audio/" + path)) {
             if (raw == null) {
+                Log.warn("Son manquant : audio/" + path);
                 return Optional.empty();
             }
             return Optional.of(decode(new BufferedInputStream(raw)).normalized());
         } catch (IOException | UnsupportedAudioFileException | IllegalArgumentException e) {
+            Log.warn("Son illisible : audio/" + path, e);
             return Optional.empty();
         }
     }

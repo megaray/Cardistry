@@ -1,5 +1,6 @@
 package cardistry.ui.audio;
 
+import cardistry.utils.Log;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -46,6 +47,7 @@ public final class SoundTable {
         try (InputStream in = SoundTable.class.getResourceAsStream("/audio/sounds.txt")) {
             return in == null ? parse("") : parse(new String(in.readAllBytes(), StandardCharsets.UTF_8));
         } catch (IOException e) {
+            Log.warn("Table des sons illisible : jeu sans effets", e);
             return parse("");
         }
     }
@@ -89,6 +91,7 @@ public final class SoundTable {
                     }
                 }
             } catch (NumberFormatException e) {
+                Log.warn("Ligne de sounds.txt ignorée : " + line);
                 continue;
             }
             if (!files.isEmpty()) {

@@ -1,5 +1,6 @@
 package cardistry.platform;
 
+import cardistry.utils.Log;
 import cardistry.run.Secret;
 import cardistry.run.UnlockStore;
 import java.io.IOException;
@@ -65,9 +66,11 @@ public final class UnlockFile implements UnlockStore {
             }
             lines = Files.readAllLines(file, StandardCharsets.UTF_8);
         } catch (IOException | UncheckedIOException | SecurityException e) {
+            Log.warn("Secrets débloqués illisibles (" + file + ")", e);
             return Optional.empty();
         }
         if (lines.isEmpty() || !lines.get(0).strip().equals(HEADER)) {
+            Log.warn("Fichier des secrets sans en-tête (" + file + ") : considéré corrompu");
             return Optional.empty();
         }
         Set<Secret> secrets = EnumSet.noneOf(Secret.class);
@@ -108,7 +111,7 @@ public final class UnlockFile implements UnlockStore {
                 Files.move(temp, file, StandardCopyOption.REPLACE_EXISTING);
             }
         } catch (IOException | SecurityException e) {
-            // Sauvegarde impossible : on joue quand même.
+            Log.warn("Sauvegarde des secrets impossible (" + file + ")", e); // on joue quand même
         } finally {
             deleteQuietly(temp);
         }
@@ -130,6 +133,7 @@ public final class UnlockFile implements UnlockStore {
         try {
             Files.deleteIfExists(file);
         } catch (IOException | SecurityException e) {
+            Log.warn("Suppression des secrets impossible (" + file + ") : fichier vidé", e);
             save(EnumSet.noneOf(Secret.class));
         }
     }

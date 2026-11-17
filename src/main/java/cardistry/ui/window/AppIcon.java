@@ -1,5 +1,6 @@
 package cardistry.ui.window;
 
+import cardistry.utils.Log;
 import java.awt.Image;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,6 +26,7 @@ public final class AppIcon {
                 }
             } catch (IOException e) {
                 // Icône manquante : la fenêtre garde celle par défaut.
+                Log.warn("Icône illisible : cardistry-" + size + ".png", e);
             }
         }
         return images;
