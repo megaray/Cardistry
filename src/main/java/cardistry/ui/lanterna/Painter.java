@@ -46,6 +46,13 @@ final class Painter {
         return image(col, row, ICON_WIDTH, 1, CombatWindowScreen.icon(content), null, 1f) ? ICON_WIDTH + 1 : 0;
     }
 
+    /** Retire les images et marques qui débordent sur les lignes {@code row} et suivantes. */
+    void hideImagesFrom(int row) {
+        if (images != null) {
+            images.hideFrom(row);
+        }
+    }
+
     /** {@code true} si ce dessin peut afficher des images (fenêtre, images activées). */
     boolean hasImages() {
         return images != null;

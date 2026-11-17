@@ -94,7 +94,7 @@ public final class Main {
         Log.info("Affichage : " + mode + (headless ? " (sans affichage graphique)" : "")
                 + ", ascii=" + textAscii + ", couleurs=" + color + ", rapide=" + fast);
         Display display = new Display(mode, fast, asciiRequested, textAscii, color, options.contains("--crt"),
-                !options.contains("--no-images"));
+                !options.contains("--no-images"), options.contains("--debug"));
         if (options.contains("--sprites")) {
             viewSprites(display);
             return;
@@ -118,7 +118,7 @@ public final class Main {
                 Game game = games.get();
                 runText(game, game.bus(), fast, textAscii, color, sound);
             }
-            case TERMINAL -> runFullScreen(games, fast, textAscii, color, sound);
+            case TERMINAL -> runFullScreen(games, fast, textAscii, color, sound, display.debug());
             case WINDOW -> runWindow(games, display, sound);
         }
         sound.director().audio().close();
@@ -152,7 +152,7 @@ public final class Main {
 
     /** Options d'affichage. */
     record Display(Mode mode, boolean fast, boolean asciiRequested, boolean textAscii, boolean color, boolean crt,
-            boolean images) {
+            boolean images, boolean debug) {
     }
 
     /** Visionneuse de sprites, dans le même affichage que le jeu (fenêtre, plein écran ou texte). */
@@ -219,6 +219,7 @@ public final class Main {
         while (true) {
             Game game = games.get();
             game.bus().subscribe(ui::onEvent);
+            ui.attachDevRun(game.run());
             try {
                 play(game, ui, ui, sound);
             } catch (cardistry.ui.LeaveGameException e) {
@@ -230,7 +231,7 @@ public final class Main {
     }
 
     private static void runFullScreen(java.util.function.Supplier<Game> games, boolean fast, boolean ascii,
-            boolean color, Sound sound) {
+            boolean color, Sound sound, boolean debug) {
         LanternaUi ui;
         try {
             ui = LanternaUi.open(fast, ascii);
@@ -240,6 +241,9 @@ public final class Main {
             Game game = games.get();
             runText(game, game.bus(), fast, ascii, color, sound);
             return;
+        }
+        if (debug) {
+            ui.enableDevConsole();
         }
         try (ui) {
             sessions(games, ui, sound);
@@ -254,6 +258,9 @@ public final class Main {
     /** Fenêtre du jeu (police embarquée : Unicode toujours disponible) ; quitte la JVM à la fin. */
     private static void runWindow(java.util.function.Supplier<Game> games, Display d, Sound sound) {
         try (LanternaUi ui = LanternaUi.openWindow(d.fast(), d.asciiRequested(), d.crt(), d.images())) {
+            if (d.debug()) {
+                ui.enableDevConsole();
+            }
             sessions(games, ui, sound);
         } catch (QuitGameException e) {
             // Le joueur a quitté.
