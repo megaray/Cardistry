@@ -110,6 +110,10 @@ public final class Run {
     private record LeaveAltar() implements Step{
     }
 
+    /** Triche de la console de développement ({@link cardistry.core.DevCheats}). */
+    private record Cheat(java.util.function.Consumer<GameState> change) implements Step {
+    }
+
     /** Début d'un tour où le joueur agit : {@code historySize} étapes le précèdent. */
     private record TurnMark(int historySize, int combat, int turn) {
     }
@@ -425,6 +429,20 @@ public final class Run {
     // --- Ctrl+Z ---
 
     /**
+     * Applique une triche de la console de développement et la garde dans l'historique : un rejeu
+     * (Ctrl+Z) la refait au même moment, et l'annuler avec le tour qui la suit l'efface.
+     *
+     * @throws IllegalStateException si la partie n'a pas commencé ou si la triche est impossible ici
+     */
+    public void cheat(java.util.function.Consumer<GameState> change) {
+        if (session == null) {
+            throw new IllegalStateException("Partie pas encore commencée");
+        }
+        change.accept(state());
+        history.add(new Cheat(change));
+    }
+
+    /**
      * {@code true} si le joueur peut annuler son dernier tour maintenant : Ctrl+Z équipé, pas
      * encore utilisé pendant ce combat, et un tour précédent dans ce même combat.
      */
@@ -483,6 +501,7 @@ public final class Run {
                 case StatPoint s -> replayed.engine.spendStatPoint(s.stat());
                 case Sacrifice s-> replayed.engine.sacrifice(s.stat());
                 case LeaveAltar s-> replayed.atAltar=false;
+                case Cheat c -> c.change().accept(replayed.engine.state());
                 case CardReward c -> {
                     replayed.engine.resolveCardReward(c.index());
                     replayed.settle();
