@@ -50,6 +50,8 @@ public final class Main {
      *   <li>{@code --ascii} affichage en ASCII pur ; automatique si la sortie n'est pas en UTF-8</li>
      *   <li>{@code --no-color} mode texte sans couleurs ANSI ; automatique dans la vieille console
      *       Windows (hors Windows Terminal et terminaux de type Unix)</li>
+     *   <li>{@code --debug} journal détaillé ({@code debug.log} du dossier de sauvegarde, chaque
+     *       événement du jeu) et console de développement (F12) dans la fenêtre et le plein écran</li>
      * </ul>
      */
     /** Comment afficher le jeu. */
@@ -76,6 +78,7 @@ public final class Main {
 
     public static void main(String[] args) {
         List<String> options = List.of(args);
+        startLog(options);
         Os os = Os.current();
         boolean fast = options.contains("--fast");
         boolean asciiRequested = options.contains("--ascii");
@@ -88,6 +91,8 @@ public final class Main {
         } else if (headless && mode == Mode.TEXT && !options.contains("--no-ui")) {
             System.err.println("Pas d'affichage graphique ni de vrai terminal : mode texte.");
         }
+        Log.info("Affichage : " + mode + (headless ? " (sans affichage graphique)" : "")
+                + ", ascii=" + textAscii + ", couleurs=" + color + ", rapide=" + fast);
         Display display = new Display(mode, fast, asciiRequested, textAscii, color, options.contains("--crt"),
                 !options.contains("--no-images"));
         if (options.contains("--sprites")) {
@@ -163,6 +168,7 @@ public final class Main {
         } catch (QuitGameException e) {
             // Fermé.
         } catch (IOException e) {
+            Log.error("Erreur du terminal", e);
             System.err.println("Erreur du terminal : " + e.getMessage());
         }
         if (window) {
@@ -180,22 +186,24 @@ public final class Main {
      * équipé pour cette partie seulement).
      */
     static Game prepare(List<String> options, UnlockStore store) {
-        Log.println("Preparing Game...");
         if (options.contains("--reset-unlocks")) {
             store.reset();
+            Log.info("Secrets débloqués effacés (--reset-unlocks)");
         }
         EventBus bus = new EventBus();
-        Run run = new Run(parseSeed(options).seed(), store.load(), bus);
+        java.util.Set<Secret> unlocked = store.load();
+        Run run = new Run(parseSeed(options).seed(), unlocked, bus);
         if (isNullSeed(options)) {
             run.addCode(Secret.NULL_POINTER_EXCEPTION);
         }
+        Log.info("Nouvelle partie : seed " + run.seed() + ", secrets débloqués " + unlocked
+                + (isNullSeed(options) ? ", code NullPointerException" : ""));
         UnlockTracker tracker = new UnlockTracker(run::state, store, bus);
         bus.subscribe(tracker);
         return new Game(run, tracker, bus);
     }
 
     private static void play(Game game, cardistry.ui.Renderer renderer, cardistry.ui.Input input, Sound sound) {
-        Log.println("Running Game...");
         GameLoop.run(game.run(), renderer, input, game.tracker()::unlockedThisRun, sound.director());
     }
 
@@ -214,7 +222,7 @@ public final class Main {
                 play(game, ui, ui, sound);
             } catch (cardistry.ui.LeaveGameException e) {
                 // Partie abandonnée : retour au titre.
-                Log.println("Game exited.");
+                Log.info("Partie abandonnée : retour au titre");
             }
             ui.backToTitle();
         }
@@ -226,6 +234,7 @@ public final class Main {
         try {
             ui = LanternaUi.open(fast, ascii);
         } catch (IOException e) {
+            Log.warn("Plein écran impossible : mode texte", e);
             System.err.println("Impossible d'ouvrir le plein écran (" + e.getMessage() + ") : mode texte.");
             Game game = games.get();
             runText(game, game.bus(), fast, ascii, color, sound);
@@ -236,6 +245,7 @@ public final class Main {
         } catch (QuitGameException e) {
             // Le joueur a quitté : l'écran est restauré par close().
         } catch (IOException e) {
+            Log.error("Erreur du terminal", e);
             System.err.println("Erreur du terminal : " + e.getMessage());
         }
     }
@@ -247,6 +257,7 @@ public final class Main {
         } catch (QuitGameException e) {
             // Le joueur a quitté.
         } catch (IOException e) {
+            Log.error("Erreur de la fenêtre", e);
             System.err.println("Erreur de la fenêtre : " + e.getMessage());
         }
         System.exit(0); // ferme les fils Swing
@@ -291,6 +302,28 @@ public final class Main {
         } catch (ReflectiveOperationException e) {
             return false;
         }
+    }
+
+    /**
+     * Ouvre le journal : niveau DEBUG avec {@code --debug}, INFO sinon ; note la machine et les
+     * options ; toute exception non rattrapée (fil principal, Swing, son) y est écrite avec sa pile.
+     */
+    static void startLog(List<String> options) {
+        Log.setLevel(options.contains("--debug") ? Log.Level.DEBUG : Log.Level.INFO);
+        Log.info("Cardistry démarre : Java " + System.getProperty("java.version") + ", "
+                + System.getProperty("os.name") + " " + System.getProperty("os.version")
+                + " (" + System.getProperty("os.arch") + "), options " + options);
+        Log.info("Dossier de sauvegarde : " + cardistry.platform.SaveDirectory.resolve());
+        Thread.UncaughtExceptionHandler previous = Thread.getDefaultUncaughtExceptionHandler();
+        Thread.setDefaultUncaughtExceptionHandler((thread, error) -> {
+            Log.error("Exception non rattrapée dans le fil « " + thread.getName() + " »", error);
+            if (previous != null) {
+                previous.uncaughtException(thread, error);
+            } else {
+                System.err.print("Exception in thread \"" + thread.getName() + "\" ");
+                error.printStackTrace();
+            }
+        });
     }
 
     /** {@code --seed null} : code secret NullPointerException. */
