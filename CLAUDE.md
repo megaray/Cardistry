@@ -59,7 +59,7 @@ Une entrée dans `HeroRegistry` (`new Hero(id, nom, capacité, description, modi
 3. Ne jamais régénérer un tag existant pour « l'améliorer » : Louis retouche les `.aseprite` à la main. Le test `toutLeContenuAUneIcone` échoue si un objet, un trinket, une carte ou un adversaire du registre n'a pas d'image.
 
 ### Dettes restantes
-- Placeholders à dessiner par Louis (un fichier par animation, aux bons noms) : les quatre personnages et l'alien (`art/player/<id>.aseprite`), les animations attack / hurt / death de Choomah, Clarence et du boss (dérivées de leur idle), le boss (un sprite pour les trois niveaux).
+- Placeholders à dessiner par Louis (un fichier par animation, aux bons noms) : Frederic BLC et l'alien (`art/player/<id>.aseprite` ; Louis, Dave et Sassy sont dessinés dans `players.lua`), les animations attack / hurt / death de Choomah, Clarence et du boss (dérivées de leur idle), le boss (un sprite pour les trois niveaux).
 - Les animations de mort des ébauches sont la pose « touché » écrasée vers le sol.
 - En fenêtre 80×24, un adversaire sans PNG aurait son sprite ASCII coupé (7 lignes disponibles) ; aucun dans le registre aujourd'hui.
 - Les états à adversaires fixés (tests) n'ont pas de deck : leur pioche tire dans le pool, sans fin (`GameState.usesDeck()`).
