@@ -186,10 +186,10 @@ public final class EnemyRegistry {
         .sprite("nortin")
                 .behavior(nortin()));
         all.put(bossId(2), () -> Enemy.builder(bossId(2), "Zo le StreMon", ALGEBRAIC, EnemyRank.BOSS)
-                .hp(200)
+                .hp(230)
                 .sprite("zo")
                 .behavior(zo()));
-        boss(all, 3, NATURE, 250, 10, 22);
+        boss(all, 10, NATURE, 25000, 10, 22);
         return all;
     }
 
