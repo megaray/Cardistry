@@ -58,6 +58,101 @@ local function heroSprite(id, look)
   }
 end
 
+-- ------------------------------------------------------------------ Sassy (dessin dédié)
+-- Un sasquatch : grand corps de fourrure brune, tête en pointe, visage gris aux grands yeux noirs,
+-- grosses lèvres, torse gris ; il tient un joint à hauteur du torse, la fumée monte. Tourné vers la droite.
+-- pose : bob, alt (fumée et braise de l'autre frame), lean, punch (bras tendu vers l'adversaire),
+-- eyes ("x"), mouth ("open"), flash.
+
+local function sassyFur(c, x, y, n, l)
+  -- mèches de fourrure : petits traits obliques
+  for i = 0, n - 1 do c:line(x + i * 3, y + (i % 2), x + i * 3 + 1, y + (i % 2) + 2, l) end
+end
+
+local function sassy(c, pose)
+  pose = pose or {}
+  local b = c:shift(pose.lean or 0, 0)
+  local u = b:shift(0, pose.bob or 0)
+  -- jambes courtes et pieds gris
+  b:rect(21, 50, 9, 9, "n"); b:rect(35, 50, 9, 9, "n")
+  b:vline(29, 51, 58, "N"); b:vline(43, 51, 58, "N")
+  b:ellipse(27, 60, 6, 2, "3"); b:ellipse(41, 60, 6, 2, "3")
+  b:hline(23, 31, 62, "2"); b:hline(37, 45, 62, "2")
+  -- bras arrière : long, pend le long du corps
+  u:ellipse(14, 41, 5, 13, "N"); u:ellipse(15, 40, 3, 11, "n")
+  u:disc(14, 55, 3, "3"); u:px(13, 57, "2"); u:px(15, 57, "2")
+  -- corps massif, épaules rondes
+  u:ellipse(32, 40, 16, 15, "n"); u:ellipse(32, 31, 18, 8, "n")
+  u:arc(32, 40, 16, 15, 90, 160, "N")
+  -- torse gris
+  u:ellipse(34, 41, 9, 10, "3"); u:ellipse(32, 38, 4, 4, "4"); u:ellipse(34, 41, 9, 10, "3")
+  u:arc(34, 41, 9, 10, 200, 340, "n")
+  u:line(30, 44, 33, 45, "2"); u:line(35, 49, 38, 48, "2")
+  -- mèches sur les épaules et le ventre
+  sassyFur(u, 17, 30, 4, "N"); sassyFur(u, 41, 29, 3, "N"); sassyFur(u, 19, 45, 2, "N")
+  u:px(20, 27, "o"); u:px(23, 25, "o"); u:px(44, 26, "o"); u:px(47, 28, "o")
+  -- tête en pointe, visage gris (de trois quarts vers la droite)
+  local h = u
+  h:ellipse(33, 16, 11, 12, "n")
+  h:tri(25, 10, 40, 10, 32, 0, "n")
+  h:line(31, 1, 30, -1, "n"); h:line(33, 0, 35, -2, "n")
+  sassyFur(h, 24, 6, 2, "N"); h:px(28, 4, "o"); h:px(37, 5, "o")
+  h:ellipse(36, 18, 7, 8, "3")
+  h:hline(30, 42, 12, "N")
+  h:hline(31, 41, 13, "2")
+  -- yeux : deux grands trous noirs, un reflet
+  if pose.eyes == "x" then
+    h:line(31, 14, 34, 17, "1"); h:line(34, 14, 31, 17, "1")
+    h:line(38, 14, 41, 17, "1"); h:line(41, 14, 38, 17, "1")
+  else
+    h:ellipse(33, 16, 2, 3, "1"); h:ellipse(39, 16, 2, 3, "1")
+    h:px(32, 14, "4"); h:px(38, 14, "4")
+  end
+  -- nez large
+  h:hline(36, 39, 20, "2"); h:px(37, 19, "4")
+  -- grosses lèvres, bouche fermée ou ouverte
+  h:ellipse(37, 24, 6, 3, "2"); h:ellipse(37, 24, 5, 2, "4"); h:hline(34, 40, 22, "5")
+  if pose.mouth == "open" then
+    h:ellipse(37, 24, 3, 1, "1")
+  else
+    h:hline(32, 42, 24, "1")
+  end
+  -- bras avant
+  if pose.punch then
+    u:ellipse(46, 33, 5, 5, "n")
+    u:rect(46, 30, 12, 7, "n"); sassyFur(u, 47, 29, 3, "N")
+    u:disc(59, 33, 4, "3"); u:vline(60, 31, 35, "2")
+    for _, y in ipairs({ 27, 33, 39 }) do u:hline(1, 7, y, "6") end
+  else
+    u:ellipse(48, 37, 5, 9, "n"); u:arc(48, 37, 5, 9, 270, 450, "N")
+    u:line(49, 45, 41, 44, "n", 5)
+    u:disc(40, 45, 4, "2"); u:disc(40, 45, 3, "3"); u:hline(37, 41, 46, "2"); u:px(38, 44, "4")
+    -- joint et fumée
+    u:hline(42, 47, 43, "6"); u:px(48, 43, pose.alt and "Y" or "R")
+    local s = pose.alt and 1 or 0
+    u:px(48, 41, "4"); u:px(49 - s, 39, "4"); u:px(48 + s, 37, "4"); u:px(47 + s, 35, "4")
+    u:px(48 - s, 33, "5"); u:px(50 - s, 31, "5"); u:px(51, 29 - s, "5"); u:px(50 + s, 26, "5")
+  end
+  if pose.flash then
+    for _, p in ipairs({ { 4, 8 }, { 9, 2 }, { 2, 18 } }) do c:line(p[1], p[2], p[1] + 4, p[2] + 4, "6") end
+  end
+end
+
+local function sassyFrame(pose) return function(lib) return lib.drawn(64, function(c) sassy(c, pose) end) end end
+
+local SASSY = {
+  id = "sassy",
+  animations = {
+    { name = "idle", frames = { sassyFrame({}), sassyFrame({ bob = 1, alt = true }) } },
+    { name = "attack", frames = { sassyFrame({ lean = 2, mouth = "open" }), sassyFrame({ lean = 3, punch = true, mouth = "open" }) } },
+    { name = "hurt", frames = { sassyFrame({ lean = -4, eyes = "x", mouth = "open", flash = true }) } },
+    { name = "death", frames = {
+      sassyFrame({ lean = -2, eyes = "x", mouth = "open" }),
+      function(lib) return lib.squashed(lib.drawn(64, function(c) sassy(c, { eyes = "x", mouth = "open" }) end), 0.35) end,
+    } },
+  },
+}
+
 -- ------------------------------------------------------------------ Alien de Sassy (familier)
 -- Petit alien vert, antennes, grands yeux noirs. pose : beam (il tire), joint (il fume), ko (assommé), bob.
 
@@ -103,7 +198,7 @@ local function alienFrame(pose) return function(lib) return lib.drawn(64, functi
 return {
   heroSprite("louis", { shirt = "R", dark = "r", hair = "N", pants = "u" }),
   heroSprite("dave", { shirt = "B", dark = "b", hair = "n", pants = "2" }),
-  heroSprite("sassy", { shirt = "M", dark = "m", hair = "o", pants = "u" }),
+  SASSY,
   heroSprite("frederic-blc", { shirt = "4", dark = "3", hair = "y", pants = "2" }),
   {
     id = "alien",
