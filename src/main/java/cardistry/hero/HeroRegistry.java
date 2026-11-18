@@ -33,7 +33,7 @@ public final class HeroRegistry {
             new cardistry.model.Familiar.Spec("alien", "Alien", ALIEN_HP, ALIEN_TARGET_CHANCE);
 
     // --- Stats de base (FOR, INT, ESP, DEF, RES, CHA) : 8 points, 12 pour Frederic BLC ---
-    public static final int[] LOUIS_STATS = {3, 2, 0, 1, 1, 1};
+    public static final int[] LOUIS_STATS = {5, 2, 1, 3, 1, 1};
     public static final int[] DAVE_STATS = {2, 3, 1, 1, 1, 1};
     public static final int[] SASSY_STATS = {2, 0, 2, 2, 2, 1};
     public static final int[] FREDERIC_STATS = {2, 2, 2, 2, 2, 2};
@@ -46,8 +46,7 @@ public final class HeroRegistry {
             });
 
     public static final Hero DAVE = new Hero("dave", "Dave", "Full skill Mr. Le Juge",
-            "Un sort du même élément que le terrain te soigne des PV"
-                    + " qu'il lui enlève.",
+            "Un sort du même élément que le terrain te soigne les PV que tu enlève à l'ennemi",
             stats("dave", DAVE_STATS),
             new GameHooks() {
                 @Override

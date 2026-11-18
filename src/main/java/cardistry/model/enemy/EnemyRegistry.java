@@ -1,21 +1,21 @@
 package cardistry.model.enemy;
 
-import static cardistry.model.Element.FIRE;
-import static cardistry.model.Element.NATURE;
-import static cardistry.model.Element.NEUTRAL;
-import static cardistry.model.Element.WATER;
-import static cardistry.model.Element.ALGEBRAIC;
-import static cardistry.model.Element.GEOMETRIC;
-import static cardistry.model.Element.GLITCH;
-import static cardistry.model.Element.SPIRIT;
-
-import cardistry.core.Rng;
-import cardistry.model.Element;
-import cardistry.model.Enemy;
-import cardistry.model.enemy.MoveEffect.Hit;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import cardistry.core.Rng;
+import cardistry.model.Element;
+import static cardistry.model.Element.ALGEBRAIC;
+import static cardistry.model.Element.FIRE;
+import static cardistry.model.Element.GEOMETRIC;
+import static cardistry.model.Element.GLITCH;
+import static cardistry.model.Element.NATURE;
+import static cardistry.model.Element.NEUTRAL;
+import static cardistry.model.Element.SPIRIT;
+import static cardistry.model.Element.WATER;
+import cardistry.model.Enemy;
+import cardistry.model.enemy.MoveEffect.Hit;
 
 /**
  * Registre de tous les adversaires : PV, attaques et stats au niveau 1, multipliés par niveau
@@ -182,14 +182,14 @@ public final class EnemyRegistry {
         common(all, GOBELIN, "Gobelin", NATURE, 22, gobelin());
         elite(all, ENGEANCE, "Engeance des cookies", GLITCH, 60, engeance(), 0);
         all.put(bossId(1), () -> Enemy.builder(bossId(1), "Nortin", NEUTRAL, EnemyRank.BOSS)
-        .hp(160)
+        .hp(120)
         .sprite("nortin")
                 .behavior(nortin()));
         all.put(bossId(2), () -> Enemy.builder(bossId(2), "Zo le StreMon", ALGEBRAIC, EnemyRank.BOSS)
-                .hp(250)
+                .hp(200)
                 .sprite("zo")
                 .behavior(zo()));
-        boss(all, 3, NATURE, 280, 10, 22);
+        boss(all, 3, NATURE, 250, 10, 22);
         return all;
     }
 
