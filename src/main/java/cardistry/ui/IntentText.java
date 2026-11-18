@@ -120,6 +120,7 @@ public final class IntentText {
                     + num(state.hasEnemy() ? cardistry.core.CombatFormula.heal(heal.amount() * state.currentEnemy().damageScale(),
                             state.currentEnemy().stat(cardistry.core.stats.StatType.MIND), 1.0) : heal.amount());
             case MoveEffect.ChangeElement change -> "change d'élément";
+            case MoveEffect.SetTerrain set -> "pose le Royaume du Colonel";
             case MoveEffect.Inflict inflict -> (inflict.chance() < 1 ? percent(inflict.chance()) + " de " : "")
                     + cardistry.core.status.StatusType.byId(inflict.status()).displayName()
                     + (inflict.turns() > 0 ? " " + StatusText.turns(inflict.turns()) : "");

@@ -95,4 +95,11 @@ public final class EnemyTerrains {
     private static TerrainCard terrain(String name, Element element, String text, StatModifier... modifiers) {
         return new TerrainCard(name, element, COMMON).withBonuses(text, modifiers);
     }
+
+
+    public static TerrainCard terrainColonel() {
+        return new TerrainCard("Royaume du Colonel", NATURE, COMMON)
+                .withEffect(TerrainCard.Effect.NO_HEALING, "aucun soin possible dans le royaume du Colonel");
+    }
+
 }

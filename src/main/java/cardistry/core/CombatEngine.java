@@ -1633,6 +1633,11 @@ public final class CombatEngine {
                 enemy.changeElement(next);
                 bus.publish(new GameEvent.EnemyElementChanged(enemy, previous, next));
             }
+
+            case MoveEffect.SetTerrain set -> {
+                changeTerrain(set.terrain().get());
+            }
+
             case MoveEffect.Inflict inflict -> {
                 if (!inflict.afterHit() || run.landed) {
                     tryStatus(StatusTarget.PLAYER, StatusType.byId(inflict.status()), inflict.chance(),
@@ -1791,8 +1796,14 @@ public final class CombatEngine {
     /**
      * Soigne sans dépasser les PV max (sauf si les soins ne sont pas plafonnés) ; l'événement porte
      * les PV réellement rendus.
+     * Soins bloqués sur certains terrains
      */
     private void healPlayer(double amount, double mult) {
+        if(state.terrain().effect() == TerrainCard.Effect.NO_HEALING){
+            effects.announce("Heal bloqué par " + state.terrain().name());
+            return; // clopes autorisées ? voir Questions ouvertes
+        }
+
         Player player = state.player();
         double missing = Math.max(0, state.maxHp() - player.hp());
         double healed = Combatant.round(state.healingUncapped() ? amount : Math.min(amount, missing));
