@@ -1,0 +1,22 @@
+@name Choomah pressé
+@# Maigre et jaune, bras en l'air, jambes écartées ; il hurle bouche grande ouverte.
+@frame idle
+\\      ,|,     //
+ \\   ( \ / )  //
+  \\ ( o  o  )//
+   \( ( OO )  )/
+    (        )
+     ( ~~~~ )
+     /  /\  \
+    /  /  \  \
+  _/__/    \__\_
+@colors
+YY      ccc     YY
+ YY   YYYYYYY  YY
+  YY YYkYYkYYYYY
+   YYYYrrrYYYYY
+    YYYYYYYYYY
+     YYyyyyYY
+     YYYYYYYY
+    YYY    YYY
+  YYYYY    YYYYY

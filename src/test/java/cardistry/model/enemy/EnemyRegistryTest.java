@@ -219,7 +219,8 @@ class EnemyRegistryTest {
             assertTrue(move.name().matches("[OAUoau]+"), move.name());
             assertTrue(move.description().matches("[OAUoau]+"), move.description());
         }
-        assertEquals(CHOOMAH, create(CHOOMAH_PRESSE, 1).spriteId());
+        assertEquals(CHOOMAH_PRESSE, create(CHOOMAH_PRESSE, 1).spriteId());
+        assertEquals(CHOOMAH_COSTAUD, create(CHOOMAH_COSTAUD, 1).spriteId());
     }
 
     @Test

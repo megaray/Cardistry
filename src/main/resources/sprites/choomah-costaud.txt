@@ -1,0 +1,24 @@
+@name Choomah costaud
+@# Massif et jaune, sourcils lourds, énormes lèvres, longs bras à griffes.
+@frame idle
+      _,-~~~~-,_
+     /  ======  \
+    |  -_-  -_-  |
+    |   \        |
+   (( ######    ))
+   |   ~~  ~~    |
+  /|   -  -  -   |\
+ / |   -  -  -   | \
+ W |____/  \____ |  W
+      (__)  (__)
+@colors
+      YYYYYYYYYY
+     YYyyyyyyyYY
+    YYYkkYYYkkYYY
+    YYYYyYYYYYYYY
+   YYYrrrrrrYYYYY
+   YYYYyyYYyyYYYYY
+  YYYYYyYYyYYyYYYY
+ YYYYYYyYYyYYyYYYYY
+ YYYYYYYYYYYYYYYYYYY
+      YYYY  YYYY
