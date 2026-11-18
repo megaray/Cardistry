@@ -1,0 +1,82 @@
+@name Colonel Eclatax
+@# Boss du niveau 3 (plante) : haute casquette verte, insigne dore, grosse moustache, epaulettes rouges ; il lance des pommes de terre.
+@frame idle
+        _.-^^^-._
+     _.'  \*|*/  '._
+    (=====**Y**=====)
+   <_______________|
+       | (o)  (o) |)
+       |@    o   @|
+    ~~~~\(______)/~~~~
+         \ \__/ /
+  {###}--\ \|/ /--{###}
+  |###|   \_V_/   |###|
+@colors
+        GGGGGGGGG
+     GGG  YYYYY  GGG
+    rrrrrrYYYYYrrrrrr
+   kkkkkkkkkkkkkkkkk
+       w wkw  wkw ww
+       wR    w   Rw
+    kkkkwwwwwwwwwwkkkk
+         w wwww w
+  RYYYRggw wkw wggRYYYR
+  ggggg   wwkww   ggggg
+
+@frame idle
+        _.-^^^-._
+     _.'  \*|*/  '._
+    (=====**Y**=====)
+   <_______________|
+       | (-)  (-) |)
+       |@    o   @|
+   ~~~~~\(______)/~~~~~
+         \ \__/ /
+  {###}--\ \|/ /--{###}
+  |###|   \_V_/   |###|
+@colors
+        GGGGGGGGG
+     GGG  YYYYY  GGG
+    rrrrrrYYYYYrrrrrr
+   kkkkkkkkkkkkkkkkk
+       w wkw  wkw ww
+       wR    w   Rw
+   kkkkkwwwwwwwwwwkkkkk
+         w wwww w
+  RYYYRggw wkw wggRYYYR
+  ggggg   wwkww   ggggg
+
+@frame attack
+        _.-^^^-._
+     _.'  \*|*/  '._
+    (=====**Y**=====)
+   <_______________|
+       | (O)  (O) |)
+       |@    o   @|
+    ~~~~\(______)/~~~~
+         \ (  ) /
+ @{###}--\ \|/ /--{###}
+  |###|   \_V_/   |###|
+@colors
+        GGGGGGGGG
+     GGG  YYYYY  GGG
+    rrrrrrYYYYYrrrrrr
+   kkkkkkkkkkkkkkkkk
+       w wkw  wkw ww
+       wR    w   Rw
+    kkkkwwwwwwwwwwkkkk
+         w w  w w
+ yRYYYRggw wkw wggRYYYR
+  ggggg   wwkww   ggggg
+
+@frame hurt
+        _.-^^^-._
+     _.'  \*|*/  '._
+    (=====**Y**=====)
+   <_______________|
+       | (x)  (x) |)
+       |@    o   @|
+    ~~~~\(______)/~~~~
+         \ (  ) /
+  {###}--\ \|/ /--{###}
+  |###|   \_V_/   |###|
