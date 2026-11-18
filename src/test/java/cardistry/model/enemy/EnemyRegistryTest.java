@@ -109,7 +109,6 @@ class EnemyRegistryTest {
         assertEquals(1.5, create(bossId(3), 3).damageScale(), DELTA);
         Enemy boss = create(bossId(3), 3);
         assertEquals(EnemyRank.BOSS, boss.rank());
-        assertEquals(List.of("coup", "coup", "coup", "grosse-attaque", "coup"), ids(moves(boss, 5)));
     }
 
     @Test
@@ -122,9 +121,37 @@ class EnemyRegistryTest {
         assertEquals("nortin", nortin.spriteId());
     }
 
+    // --- Colonel Eclatax (boss du niveau 3) ---
+
     @Test
-    void leBossDuNiveauTroisGardeLeSpriteCommun() {
-        assertEquals("boss", create(bossId(3), 1).spriteId());
+    void colonelEclataxEstLeBossDuNiveauTrois() {
+        Enemy colonel = create(bossId(3), 3);
+        assertEquals("Colonel Eclatax", colonel.name());
+        assertEquals(Element.NATURE, colonel.element());
+        assertEquals(EnemyRank.BOSS, colonel.rank());
+        assertEquals("colonel", colonel.spriteId());
+    }
+
+    @Test
+    void colonelCycleDeSixToursQuiCommenceParSonPotager() {
+        List<String> cycle = List.of("potager", "pomme-de-terre", "pomme-de-terre", "pomme-de-terre",
+                "petite-clope", "taffe-de-foufou-batard");
+        List<String> twice = new ArrayList<>(cycle);
+        twice.addAll(cycle);
+        assertEquals(twice, ids(moves(create(bossId(3), 3), 12)));
+    }
+
+    @Test
+    void colonelChiffresDeSesAttaques() {
+        List<EnemyMove> moves = moves(create(bossId(3), 3), 6);
+        MoveEffect.SetTerrain potager = assertInstanceOf(MoveEffect.SetTerrain.class, moves.get(0).effects().get(0));
+        assertTrue(!potager.isAttack(), "poser son terrain n'est pas une attaque (Moscow Mule ne l'annule pas)");
+        assertEquals("Royaume du Colonel", potager.terrain().get().name());
+        Hit potato = assertInstanceOf(Hit.class, moves.get(1).effects().get(0));
+        assertEquals(3, potato.damage(), DELTA);
+        assertEquals(3, potato.hits());
+        assertEquals(15, assertInstanceOf(MoveEffect.HealSelf.class, moves.get(4).effects().get(0)).amount(), DELTA);
+        assertEquals(20, damage(moves.get(5)), DELTA);
     }
 
     // --- Zo le StreMon (boss du niveau 2) ---

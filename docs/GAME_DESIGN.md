@@ -71,7 +71,7 @@ Valeurs ci-dessous au niveau 1 ; leurs stats sont dans « Stats des adversaires 
 | Élite | Engeance des cookies | GLITCH | 60 | Défoncée au space cookie. Piège pâtissier 9 ; tous les 3 tours, Green out : t'endort (Fons 1 tour) ; une fois sous 50 % PV, Méditation triptyque : passe à un autre élément (tiré au hasard, ni neutre ni GLITCH) jusqu'à la fin du combat |
 | Boss | Nortin (niveau 1) | Neutre | 160 | Cycle de 4 tours : Bitch slap 8 → Esquive (70 % d'esquiver ton prochain sort, sinon Bitch slap) → Vol de trinket (20 % de te voler un trinket, rendu si tu le bats ; sans trinket : Bitch slap) → Hit in the nuts 16 |
 | Boss | Zo le StreMon (niveau 2) | Algébrique | 250 | Cycle de 6 tours : Coup de teub 8 → Coup de teub 8 → Un dernier p'tit verre (5 dégâts, +1 Ivresse pour toi) → Coup de teub 8 → P'tite clope (se soigne de 10) → Capoeira 12 |
-| Boss | Boss du niveau 3 (**nom à venir**) | Plante | 280 | Coup 10 ; toutes les 4 attaques, Grosse attaque 22 |
+| Boss | Colonel Eclatax (niveau 3) | Plante | 280 | Cycle de 6 tours : Il était une fois dans mon potager (pose le **Royaume du Colonel** : aucun soin possible) → Pomme de terrax 3 × 3 → Pomme de terrax 3 × 3 → Pomme de terrax 3 × 3 → Ptite clope (se soigne de 15) → Taffe de foufou batardddd 20 |
 
 Statuts infligés (tirages de l'adversaire, pas doublés par CLAUDE.md) :
 
@@ -278,7 +278,7 @@ Valeurs au niveau 1 (FOR, INT, ESP, DEF, RES, CHA), code : `EnemyRegistry` (tabl
 | Engeance des cookies (élite) | 2 | 3 | 2 | 1 | 3 | 2 | Équilibrée et imprévisible |
 | Nortin | 3 | 1 | 1 | 2 | 3 | 1 | Test des stats |
 | Zo le StreMon | 4 | 4 | 2 | 3 | 4 | 2 | Exige un build |
-| Boss du niveau 3 | 5 | 3 | 3 | 4 | 5 | 3 | Fin de run |
+| Colonel Eclatax | 5 | 3 | 3 | 4 | 5 | 3 | Fin de run |
 
 Les boss ont une RES élevée pour qu'on ne puisse pas les enchaîner en Fons ou en Intox ; leurs stats seront à
 revoir avec leurs vrais noms et attaques.
@@ -549,7 +549,9 @@ Code : `model.enemy.EnemyTerrains`. Chaque combat commence sur le **terrain de l
 sont **jamais** dans le pool (ni récompense, ni shop). Leurs malus touchent le joueur tant qu'il y reste : jouer
 une carte terrain, c'est « sortir de chez l'ennemi ». Arriver chez l'adversaire n'est pas un changement de terrain
 joué (M1 et Plan du campus ne se déclenchent pas). La règle existante s'applique : un adversaire sur un terrain de
-son élément attaque à ×1.25. Boss provisoires : départ sur le Dojo.
+son élément attaque à ×1.25. Les boss commencent sur le Dojo. Colonel Eclatax pose son propre terrain en cours de
+combat (le **Royaume du Colonel**, plante), au début de chacun de ses cycles : c'est un vrai changement de terrain
+(bonus de l'ancien retirés, trinkets prévenus), et une carte terrain jouée l'en fait sortir jusqu'à son retour.
 
 | Adversaire | Terrain | Élément | Malus pour le joueur |
 |---|---|---|---|
@@ -568,6 +570,7 @@ son élément attaque à ×1.25. Boss provisoires : départ sur le Dojo.
 | Hypercube misogyne | Cabinet psy scintillant | géométrique | adversaire +15 % dégâts |
 | Gobelin | Clairière d'adolescent de base | plante | −1 taille de main *(provisoire)* |
 | Engeance des cookies | Le canapé | neutre | aucun |
+| Colonel Eclatax (posé en combat) | Royaume du Colonel | plante | **aucun soin** : tous les soins du joueur sont bloqués (cartes, objets, clopes, statuts), le journal l'annonce |
 
 ## Choomies (monnaie)
 - **15 Choomies** au début de la partie. Gagnés à chaque victoire : commun 12-18, élite 30-40, boss 80-100
@@ -637,7 +640,8 @@ Reste : transitions d'écran ; vrais sons des statuts ; vrais sprites des person
 - Couleur de rareté et d'élément partout.
 
 ## Questions ouvertes
-- **[À DÉCIDER]** Nom et attaques du boss du niveau 3 (placeholder « Boss du niveau 3 »).
+- **[À DÉCIDER]** Royaume du Colonel (terrain du boss du niveau 3, aucun soin possible) : la clope soigne-t-elle quand même ?
+- **[À DÉCIDER]** Royaume du Colonel : un soin bloqué est-il gaspillé (carte ou objet consommé pour rien), ou faut-il empêcher de le jouer sur ce terrain ?
 - **[À DÉCIDER]** Noms des variantes de Choomah (provisoires : « Choomah pressé », « Choomah costaud »).
 - **[À DÉCIDER]** Nom du vendeur du shop et sa réplique d'accueil. Il a un sprite (ébauche : bonnet, barbe, clope au bec) et il fume.
 - **[À DÉCIDER]** Dave : son soin profite-t-il des bonus de soin (efficacité, Ross) ou est-il brut ? *Provisoire : il en profite.*

@@ -189,7 +189,8 @@ public final class EnemyRegistry {
                 .hp(230)
                 .sprite("zo")
                 .behavior(zo()));
-        boss(all, 10, NATURE, 25000, 10, 22);
+        all.put(bossId(3), () -> Enemy.builder(bossId(3), "Colonel Eclatax", NATURE, EnemyRank.BOSS)
+                .hp(280).sprite("colonel").behavior(colonel()));
         return all;
     }
 
@@ -389,6 +390,30 @@ public final class EnemyRegistry {
             case 4 -> regen;
             case 5 -> capoeira;
             default -> coupTeub;
+        };
+    }
+
+
+    private static EnemyBehavior colonel() {
+        EnemyMove pommeDeTerre = EnemyMove.of("pomme-de-terre", "Pomme de terrax", "Et encore une pomme de terre",
+                Hit.of(3,3));
+        EnemyMove regen = EnemyMove.of("petite-clope", "Ptite clope",
+                "Il se fait une petite clope",
+                new MoveEffect.HealSelf(15));
+        EnemyMove taffeFoufou = EnemyMove.of("taffe-de-foufou-batard", "Taffe de foufou batardddd", "N'expirez pas...",
+                Hit.of(20));
+        EnemyMove potager = EnemyMove.of("potager", "Il était une fois dans mon potager", "[MENACE DETECTEE]",
+                new MoveEffect.SetTerrain(EnemyTerrains::terrainColonel));
+
+
+        return self -> switch (self.actions() % 6) {
+            case 0 -> potager;
+            //case 1 -> pommeDeTerre;
+            //case 2 -> pommeDeTerre;
+            //case 3 -> pommeDeTerre;
+            case 4 -> regen;
+            case 5 -> taffeFoufou;
+            default -> pommeDeTerre;
         };
     }
 
