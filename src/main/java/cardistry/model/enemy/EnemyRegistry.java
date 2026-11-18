@@ -229,7 +229,7 @@ public final class EnemyRegistry {
         EnemyMove strike = EnemyMove.of("coup", "ooOOOaAAAOaAOOA", "OAUUAOOAOAUAOOOooooooO", Hit.of(hit));
         EnemyMove steal = EnemyMove.of("vol-a-la-tire", "AAAOOAaAAOAOaAOOA", "oOOOOAOOAOAOAOAOOoOOOOOAAAAAAAA",
                 new MoveEffect.Pickpocket(5, 1, hit), new MoveEffect.Inflict(INTOX, 1, 0, false));
-        all.put(id, () -> Enemy.builder(id, name, NATURE, EnemyRank.COMMON).hp(hp).screams().sprite(CHOOMAH)
+        all.put(id, () -> Enemy.builder(id, name, NATURE, EnemyRank.COMMON).hp(hp).screams().sprite(id)
                 .behavior(EnemyBehavior.every(period, steal, strike)));
     }
 

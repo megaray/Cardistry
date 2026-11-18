@@ -1,7 +1,7 @@
 -- Sprites d'adversaires, 64×64, tournés vers la gauche (le joueur est à gauche de l'écran).
 -- Chaque adversaire : des animations (idle, attack, hurt, death) = des tags dans
 -- art/enemies/<id>.aseprite. generate.lua n'ajoute que les animations dont le tag est absent.
--- Ébauches dessinées par formes ; Choomah et Clarence ne sont pas ici (dessinés à la main).
+-- Ébauches dessinées par formes ; Clarence n'est pas ici (dessiné à la main).
 
 -- ------------------------------------------------------------------ Caddie énervé
 
@@ -728,8 +728,140 @@ local function zo(c, pose)
   h:hline(29, 33, 29, "6")
 end
 
+-- ------------------------------------------------------------------ Choomah (trois variantes, plante)
+-- Créatures jaune vif sans cou (la tête et le corps ne font qu'un), contour noir, petits yeux,
+-- grosses lèvres brunes, plis du corps en traits sombres. Elles crient tout le temps.
+-- choomahBlob : formes { ellipse cx, cy, rx, ry } ou { limb = { x1, y1, x2, y2, r } }, cernées de noir.
+
+local function choomahBlob(c, shapes, fill)
+  local function each(grow, l)
+    for _, s in ipairs(shapes) do
+      if s.limb then
+        local x1, y1, x2, y2, r = table.unpack(s.limb)
+        local steps = math.max(math.abs(x2 - x1), math.abs(y2 - y1), 1)
+        for i = 0, steps do c:disc(x1 + (x2 - x1) * i / steps, y1 + (y2 - y1) * i / steps, r + grow, l) end
+      else
+        c:ellipse(s[1], s[2], s[3] + grow, s[4] + grow, l)
+      end
+    end
+  end
+  each(1, "1"); each(0, fill or "Y")
+end
+
+local function smallX(c, x, y)
+  c:line(x, y, x + 2, y + 2, "1"); c:line(x + 2, y, x, y + 2, "1")
+end
+
+local function choomahHair(c, strands)
+  for _, h in ipairs(strands) do c:line(h[1], h[2], h[3], h[4], "2") end
+end
+
+-- Lèvres : fermées (trait) ou ouvertes (il crie).
+local function choomahLips(c, x, y, rx, ry, open)
+  c:ellipse(x, y, rx + 1, ry + 1, "1"); c:ellipse(x, y, rx, ry, "N")
+  if open then
+    c:ellipse(x, y, math.max(rx - 2, 1), math.max(ry - 1, 1), "1")
+  else
+    c:hline(x - rx + 1, x + rx - 1, y, "1"); c:hline(x - rx + 2, x + rx - 2, y - ry, "n")
+  end
+end
+
+-- Choomah : un haricot debout, petits bras, nez tombant, lèvres de côté.
+local function choomah(c, pose)
+  local bob = pose.alt and 1 or 0
+  local u = c:shift(0, bob)
+  local reach = pose.attack and { 20, 36, 7 - pose.attack * 2, 36, 2 } or { 21, 36, 17, 48, 2 }
+  choomahBlob(c, { { limb = { 28, 52, 27, 60, 3 } }, { limb = { 37, 52, 38, 60, 3 } } })
+  c:hline(23, 30, 62, "1"); c:hline(35, 42, 62, "1")
+  choomahBlob(u, { { 33, 30, 12, 18 }, { 33, 43, 13, 11 }, { limb = reach }, { limb = { 45, 36, 48, 48, 2 } } })
+  if pose.attack then for i = -1, 1 do u:line(reach[3], 36, reach[3] - 3, 36 + i * 2, "Y") end end
+  choomahHair(u, { { 33, 11, 31, 8 }, { 36, 11, 38, 7 }, { 35, 11, 35, 8 } })
+  -- plis : pectoraux, ventre, genoux
+  u:arc(28, 37, 4, 2, 0, 160, "y"); u:arc(38, 37, 4, 2, 20, 180, "y")
+  u:hline(31, 34, 44, "y"); u:hline(29, 31, 48, "y"); u:vline(42, 42, 46, "y")
+  c:hline(26, 28, 56, "y"); c:hline(37, 39, 56, "y")
+  -- visage tourné vers la gauche
+  if pose.hurt then
+    smallX(u, 23, 21); smallX(u, 31, 20)
+  else
+    u:rect(24, 22, 2, 2, "1"); u:rect(32, 21, 2, 2, "1")
+    u:line(22, 20, 26, 21, "y"); u:line(31, 19, 35, 19, "y")
+  end
+  u:line(28, 23, 26, 28, "y"); u:px(27, 28, "1"); u:px(25, 28, "y")
+  choomahLips(u, 26, 32, 5, 2, pose.attack or pose.hurt)
+end
+
+-- Choomah pressé : maigre, bras en l'air, jambes écartées, il hurle bouche grande ouverte.
+local function choomahPresse(c, pose)
+  local flap = pose.alt and 3 or 0
+  local left, right
+  if pose.attack then
+    left = { { limb = { 25, 32, 12 - pose.attack * 2, 30, 2 } } }
+    right = { { limb = { 40, 32, 50, 22, 2 } }, { limb = { 50, 22, 53, 14, 2 } } }
+  else
+    left = { { limb = { 25, 32, 15, 26 + flap, 2 } }, { limb = { 15, 26 + flap, 11, 17 + flap, 2 } } }
+    right = { { limb = { 40, 32, 50, 27 - flap, 2 } }, { limb = { 50, 27 - flap, 54, 18 - flap, 2 } } }
+  end
+  local shapes = { { 32, 25, 9, 13 }, { 32, 39, 9, 10 },
+    { limb = { 28, 47, 21 - flap // 3, 58, 3 } }, { limb = { 37, 47, 44, 58, 3 } },
+    { 18 - flap // 3, 60, 4, 2 }, { 46, 60, 4, 2 } }
+  for _, l in ipairs(left) do shapes[#shapes + 1] = l end
+  for _, l in ipairs(right) do shapes[#shapes + 1] = l end
+  choomahBlob(c, shapes)
+  -- doigts écartés
+  local hl = left[#left].limb; local hr = right[#right].limb
+  for i = -1, 1 do
+    c:line(hl[3], hl[4], hl[3] - 4, hl[4] - 1 + i * 3, "Y")
+    c:line(hr[3], hr[4], hr[3] + 1 + i * 2, hr[4] - 5, "Y")
+  end
+  choomahHair(c, { { 31, 12, 29, 7 }, { 33, 12, 34, 6 }, { 35, 13, 38, 9 } })
+  c:px(29, 6, "c"); c:px(34, 5, "c"); c:px(38, 8, "c")
+  -- plis
+  c:arc(32, 40, 5, 2, 20, 160, "y"); c:hline(30, 33, 45, "y"); c:line(24, 51, 22, 54, "y"); c:line(41, 51, 42, 54, "y")
+  -- visage : sourcils froncés, bouche en O
+  if pose.hurt then
+    smallX(c, 23, 18); smallX(c, 32, 17)
+  else
+    c:rect(24, 19, 2, 2, "1"); c:rect(33, 18, 2, 2, "1"); c:px(35, 18, "6")
+    c:line(22, 15, 27, 18, "1"); c:line(36, 15, 32, 17, "1")
+  end
+  choomahLips(c, 28, 27, 4, pose.hurt and 3 or 4, true)
+end
+
+-- Choomah costaud : massif, sourcils lourds, gros nez, énormes lèvres, longs bras à griffes.
+local function choomahCostaud(c, pose)
+  local bob = pose.alt and 1 or 0
+  local u = c:shift(0, bob)
+  local reach = pose.attack and { 19, 32, 8 - pose.attack * 2, 40, 3 } or { 19, 32, 11, 50, 3 }
+  choomahBlob(c, { { limb = { 26, 52, 25, 60, 5 } }, { limb = { 39, 52, 40, 60, 5 } } })
+  c:hline(19, 31, 63, "1"); c:hline(34, 46, 63, "1")
+  choomahBlob(u, { { 32, 26, 15, 20 }, { 32, 42, 16, 13 }, { limb = reach }, { limb = { 46, 32, 53, 50, 3 } } })
+  -- griffes
+  for i = -1, 1 do
+    u:line(reach[3], reach[4] + 2, reach[3] - 2 + i * 2, reach[4] + 6, "Y")
+    u:line(53, 52, 53 + i * 2, 57, "Y")
+  end
+  choomahHair(u, { { 21, 13, 17, 10 }, { 43, 12, 47, 9 }, { 44, 14, 48, 13 }, { 33, 6, 35, 3 } })
+  -- plis : pectoraux, abdos, bras
+  u:arc(25, 38, 6, 3, 0, 170, "y"); u:arc(39, 38, 6, 3, 10, 180, "y"); u:vline(32, 36, 42, "y")
+  for _, y in ipairs({ 45, 49 }) do u:hline(27, 29, y, "y"); u:hline(35, 37, y, "y") end
+  u:line(48, 38, 49, 42, "y"); u:line(15, 38, 14, 42, "y")
+  c:hline(23, 26, 57, "y"); c:hline(39, 42, 57, "y")
+  -- visage : arcade lourde, yeux plissés, plis des joues
+  u:hline(19, 40, 18, "y"); u:hline(20, 39, 19, "y")
+  if pose.hurt then
+    xEye(u, 22, 20, 3, "1"); xEye(u, 33, 20, 3, "1")
+  else
+    u:hline(22, 27, 21, "1"); u:hline(33, 38, 21, "1"); u:px(24, 22, "1"); u:px(35, 22, "1")
+    u:hline(23, 26, 23, "y"); u:hline(34, 37, 23, "y")
+  end
+  u:line(30, 22, 27, 28, "y"); u:line(27, 28, 30, 29, "1")
+  u:arc(19, 30, 3, 4, 120, 240, "y"); u:arc(40, 29, 3, 4, -60, 60, "y")
+  choomahLips(u, 26, 32, 7, 3, pose.attack == 2 or pose.hurt)
+end
+
 -- ------------------------------------------------------------------ placeholders
--- Choomah, Clarence et le boss sont dessinés à la main : une silhouette « ? » en attendant, avec le
+-- Clarence et le boss sont dessinés à la main : une silhouette « ? » en attendant, avec le
 -- seul tag idle. Remplacer le dessin dans le .aseprite (le script n'y touchera plus).
 
 local function placeholder(id, crown)
@@ -755,6 +887,8 @@ return {
   standard("t-rex-defonce", trex), standard("etudiant-post-examen", etudiant), standard("vafi", vafi),
   standard("gourou-du-sat", gourou), standard("ng", ng), standard("hypercube-misogyne", hypercube),
   gobelinSprite(), standard("engeance-des-cookies", engeance), standard("nortin", nortin), standard("zo", zo),
-  placeholder("choomah", false), placeholder("clarence", false), placeholder("boss", true),
+  standard("choomah", choomah), standard("choomah-presse", choomahPresse),
+  standard("choomah-costaud", choomahCostaud),
+  placeholder("clarence", false), placeholder("boss", true),
 }
 
