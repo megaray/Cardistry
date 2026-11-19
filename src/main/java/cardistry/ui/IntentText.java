@@ -47,6 +47,7 @@ public final class IntentText {
                     : e.enemy().name() + " : " + e.move().name() + " — " + e.move().description();
             case cardistry.core.event.GameEvent.EnemyMissed e -> e.enemy().name() + " " + say(e.enemy(),
                     e.healed() > 0 ? "rate son coup et se soigne de " + num(e.healed()) + " PV" : "rate son coup");
+            case cardistry.core.event.GameEvent.SpellMissed miss -> "Trop cuit : " + miss.spell().name() + " rate sa cible !";
             case cardistry.core.event.GameEvent.DodgeReady e -> e.enemy().name() + " "
                     + say(e.enemy(), "esquivera ton prochain sort");
             case cardistry.core.event.GameEvent.EnemyDodged e -> e.enemy().name() + " " + say(e.enemy(), "esquive ton sort !");

@@ -9,6 +9,7 @@ import cardistry.items.Trinket;
 import cardistry.model.Combatant;
 import cardistry.model.Enemy;
 import cardistry.model.card.Card;
+import cardistry.model.card.SpellCard;
 import cardistry.model.card.TerrainCard;
 import cardistry.model.enemy.EnemyMove;
 import java.util.List;
@@ -65,6 +66,12 @@ public sealed interface GameEvent {
     /** Une carte de la main a été remplacée par une autre (effet). */
     record CardReplaced(Card removed, Card replacement) implements GameEvent {
     }
+
+
+    /** Ton sort rate (Cuite). */
+    record SpellMissed(SpellCard spell) implements GameEvent {
+    }
+
 
     /**
      * {@code amount} = dégâts finaux, {@code multiplier} déjà appliqué.
