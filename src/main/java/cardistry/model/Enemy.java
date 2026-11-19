@@ -101,7 +101,7 @@ public class Enemy extends Combatant {
         return damageScale;
     }
 
-    /** Part des dégâts reçus renvoyée au joueur (Le Peneu : 0,2). */
+    /** Part des dégâts reçus renvoyée au joueur (Le Peneu : 0,1). */
     public double reflectRatio() {
         return reflectRatio;
     }

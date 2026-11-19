@@ -331,10 +331,10 @@ public class CardPool {
                 .withPower("×2 si l'adversaire brûle", ctx -> { });
     }
 
-    /** Somnifère : aucun dégât, l'adversaire s'endort (Fons 1 tour). */
+    /** Somnifère : aucun dégât, l'adversaire s'endort (Fons 2 tours). */
     public static SpellCard somnifere() {
-        return new SpellCard("Somnifère", SPIRIT, 0, UNCOMMON).withPower("endort l'adversaire (Fons 1 tour)",
-                ctx -> ctx.applyStatus(StatusTarget.ENEMY, StatusType.FONS, 1, 1));
+        return new SpellCard("Somnifère", SPIRIT, 0, UNCOMMON).withPower("endort l'adversaire (Fons 2 tours)",
+                ctx -> ctx.applyStatus(StatusTarget.ENEMY, StatusType.FONS, 1, 2));
     }
 
     public static final double REVEIL_BRUTAL_ASLEEP = 20;

@@ -61,7 +61,7 @@ Valeurs ci-dessous au niveau 1 ; leurs stats sont dans « Stats des adversaires 
 | Commun | Clarence | Neutre | 1 | « Clarence te regarde. » N'attaque jamais. 3 % des combats communs ; 75 Choomies |
 | Commun | Seau de fuite | Eau | 26 | Ça goutte 2, 3, 4, 5 (le seau se remplit) ; au 5e tour Débordement 14, puis retour à zéro |
 | Élite | Vafi | Feu | 55 | Correction 8 ; tous les 3 tours, Série d'algèbre : une carte de ta main devient « Exercice 3b » (injouable pour ce combat) ; sous 50 % PV, Pause pétou (+12 PV, n'attaque pas), 2 fois max |
-| Élite | Le Peneu | Neutre | 90 | Rebond (passif) : renvoie 20 % des dégâts reçus, brut, sans jamais tuer ; Crevaison 6, +2 à chaque utilisation |
+| Élite | Le Peneu | Neutre | 90 | Rebond (passif) : renvoie 10 % des dégâts reçus, brut, sans jamais tuer ; Crevaison 6, +1 à chaque utilisation |
 | Élite | T-Rex défoncé | Plante | 65 | Morsure 13 ; bras trop courts : 30 % de rater, et il se soigne de 8 quand il rate (fringale) |
 | Élite | Étudiant post-examen | Eau | 60 | Larmes : 6, +3 par carte de moins que 5 dans ta main ; sous 50 % PV, Crise de nerfs : deux attaques par tour |
 | Commun | Gourou du Sat | Spirituel | 24 | Coup d'encens 4 ; tous les 3 tours, Regard fixe : t'hypnotise 1 tour (son coup suivant ×2) |
@@ -69,8 +69,8 @@ Valeurs ci-dessous au niveau 1 ; leurs stats sont dans « Stats des adversaires 
 | Commun | Hypercube misogyne | Géométrique | 25 | Tunnel topologique 5 ; tous les 3 tours, Célibat forcé (« ouin ouin ») 2 × 4 |
 | Commun | Gobelin | Plante | 22 | « 67 » (six seveeen) : 6 ou 7, chaque tour ; animation des deux mains et « SIX SEVEEEN ! » à l'écran |
 | Élite | Engeance des cookies | GLITCH | 60 | Défoncée au space cookie. Piège pâtissier 9 ; tous les 3 tours, Green out : t'endort (Fons 1 tour) ; une fois sous 50 % PV, Méditation triptyque : passe à un autre élément (tiré au hasard, ni neutre ni GLITCH) jusqu'à la fin du combat |
-| Boss | Nortin (niveau 1) | Neutre | 160 | Cycle de 4 tours : Bitch slap 8 → Esquive (70 % d'esquiver ton prochain sort, sinon Bitch slap) → Vol de trinket (20 % de te voler un trinket, rendu si tu le bats ; sans trinket : Bitch slap) → Hit in the nuts 16 |
-| Boss | Zo le StreMon (niveau 2) | Algébrique | 250 | Cycle de 6 tours : Coup de teub 8 → Coup de teub 8 → Un dernier p'tit verre (5 dégâts, +1 Ivresse pour toi) → Coup de teub 8 → P'tite clope (se soigne de 10) → Capoeira 12 |
+| Boss | Nortin (niveau 1) | Neutre | 120 | Cycle de 4 tours : Bitch slap 8 → Esquive (70 % d'esquiver ton prochain sort, sinon Bitch slap) → Vol de trinket (20 % de te voler un trinket, rendu si tu le bats ; sans trinket : Bitch slap) → Hit in the nuts 16 |
+| Boss | Zo le StreMon (niveau 2) | Algébrique | 230 | Cycle de 6 tours : Coup de teub 8 → Coup de teub 8 → Un dernier p'tit verre (5 dégâts, +1 Ivresse pour toi) → Coup de teub 8 → P'tite clope (se soigne de 10) → Capoeira 12 |
 | Boss | Colonel Eclatax (niveau 3) | Plante | 280 | Cycle de 6 tours : Il était une fois dans mon potager (pose le **Royaume du Colonel** : soins divisés par deux) → Pomme de terrax 3 × 3 → Pomme de terrax 3 × 3 → Pomme de terrax 3 × 3 → Ptite clope (se soigne de 15) → Taffe de foufou batardddd 20 |
 
 Statuts infligés (tirages de l'adversaire, pas doublés par CLAUDE.md) :
@@ -173,14 +173,14 @@ comme un trinket qu'on ne peut ni perdre ni remplacer. Code : `hero.HeroRegistry
 |---|---|---|---|
 | **Louis** | 100 | MAN | +50 % de dégâts, tout le temps (tous éléments, additionné aux autres pourcentages, comme CMS). Aucun malus. |
 | **Dave** | 100 | Full skill Mr. Le Juge | Un sort du même élément que le terrain (ex. Boule de feu à l'EPFL) soigne des PV enlevés à l'adversaire. |
-| **Sassy** | 130 | wadayatalkinabit | À chaque début de tour, son alien inflige 4 dégâts bruts à l'adversaire, en plus de l'action du joueur. 10 % de chance que l'alien rate son tour et fume un joint à la place (aucun effet, pour le lore). L'alien est un **familier** de 20 PV (voir ci-dessous). |
+| **Sassy** | 130 | wadayatalkinabit | À chaque début de tour, son alien inflige 4 dégâts bruts à l'adversaire, en plus de l'action du joueur. 30 % de chance que l'alien rate son tour et fume un joint à la place (aucun effet, pour le lore). L'alien est un **familier** de 20 PV (voir ci-dessous). |
 | **Frederic BLC** | 100 | Aucune | Aucune compétence, mais des stats « parfaitement moyennes » : 2 partout (12 points au lieu de 8). |
 
-**Stats de base** (8 points pour Louis, 9 pour Dave et Sassy, 12 pour Frederic BLC) :
+**Stats de base** (11 points pour Louis, 9 pour Dave et Sassy, 12 pour Frederic BLC) :
 
 | Personnage | FOR | INT | ESP | DEF | RES | CHA | Logique |
 |---|---|---|---|---|---|---|---|
-| Louis | 3 | 2 | 0 | 1 | 1 | 1 | MAN : profil offensif |
+| Louis | 3 | 2 | 1 | 3 | 1 | 1 | MAN : profil offensif |
 | Dave | 2 | 3 | 1 | 1 | 1 | 1 | INT pour les statuts et les sorts algébriques/géométriques |
 | Sassy | 2 | 0 | 2 | 2 | 2 | 1 | Déjà 130 PV et l'alien : profil endurant |
 | Frederic BLC | 2 | 2 | 2 | 2 | 2 | 2 | Aucune capacité : le perso des builds de stats |
@@ -499,7 +499,7 @@ deck de départ, les événements et les trinkets).
 | Peu commun | Tempête d'épines | plante | 15 ; 20 % de Bondage |
 | Peu commun | Moindre carré | algébrique | 1 à 30 + 2 × INT, tirage en ta faveur (le meilleur de deux avec CLAUDE.md) ; l'INT n'est pas ajoutée une seconde fois |
 | Peu commun | dist(PLAYER) | géométrique | 10 + étages parcourus |
-| Peu commun | Somnifère | spirituel | 0 ; Fons 1 tour à l'adversaire |
+| Peu commun | Somnifère | spirituel | 0 ; Fons 2 tours à l'adversaire |
 | Peu commun | Réveil brutal | neutre | 20 à un adversaire en Fons (et le réveille), sinon 8 |
 | Rare | Purification des Chakra | spirituel | 0 ; l'adversaire est hypnotisé pour ton prochain tour |
 | Rare | Pyromane | feu | 15, ×2 si l'adversaire brûle |

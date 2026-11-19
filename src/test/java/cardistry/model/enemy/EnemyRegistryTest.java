@@ -117,7 +117,7 @@ class EnemyRegistryTest {
         assertEquals("Nortin", nortin.name());
         assertEquals(Element.NEUTRAL, nortin.element());
         assertEquals(EnemyRank.BOSS, nortin.rank());
-        assertEquals(160, nortin.maxHp(), DELTA);
+        assertEquals(120, nortin.maxHp(), DELTA);
         assertEquals("nortin", nortin.spriteId());
     }
 
@@ -162,7 +162,7 @@ class EnemyRegistryTest {
         assertEquals("Zo le StreMon", zo.name());
         assertEquals(Element.ALGEBRAIC, zo.element());
         assertEquals(EnemyRank.BOSS, zo.rank());
-        assertEquals(250, zo.maxHp(), DELTA); // PV fixes, comme tous les boss
+        assertEquals(230, zo.maxHp(), DELTA); // PV fixes, comme tous les boss
         assertEquals(1.25, zo.damageScale(), DELTA);
         assertEquals("zo", zo.spriteId());
     }
@@ -317,8 +317,8 @@ class EnemyRegistryTest {
     void peneuRebondEtCrevaisonQuiMonte() {
         Enemy peneu = create(PENEU, 1);
         assertEquals(90, peneu.maxHp(), DELTA);
-        assertEquals(0.2, peneu.reflectRatio(), DELTA);
-        assertEquals(List.of(6.0, 8.0, 10.0), moves(peneu, 3).stream().map(EnemyRegistryTest::damage).toList());
+        assertEquals(0.1, peneu.reflectRatio(), DELTA);
+        assertEquals(List.of(6.0, 7.0, 8.0), moves(peneu, 3).stream().map(EnemyRegistryTest::damage).toList());
     }
 
     @Test
