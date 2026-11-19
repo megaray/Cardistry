@@ -30,7 +30,7 @@ public final class TerrainCard extends Card {
          */
         EPFL,
 
-        /** Terrain du boss 3 : le joueur ne peut pas se soigner. */
+        /** Terrain du boss 3 : le joueur ne peut pas se soigner (ou peu). */
         NO_HEALING
     }
 

@@ -71,7 +71,7 @@ Valeurs ci-dessous au niveau 1 ; leurs stats sont dans « Stats des adversaires 
 | Élite | Engeance des cookies | GLITCH | 60 | Défoncée au space cookie. Piège pâtissier 9 ; tous les 3 tours, Green out : t'endort (Fons 1 tour) ; une fois sous 50 % PV, Méditation triptyque : passe à un autre élément (tiré au hasard, ni neutre ni GLITCH) jusqu'à la fin du combat |
 | Boss | Nortin (niveau 1) | Neutre | 160 | Cycle de 4 tours : Bitch slap 8 → Esquive (70 % d'esquiver ton prochain sort, sinon Bitch slap) → Vol de trinket (20 % de te voler un trinket, rendu si tu le bats ; sans trinket : Bitch slap) → Hit in the nuts 16 |
 | Boss | Zo le StreMon (niveau 2) | Algébrique | 250 | Cycle de 6 tours : Coup de teub 8 → Coup de teub 8 → Un dernier p'tit verre (5 dégâts, +1 Ivresse pour toi) → Coup de teub 8 → P'tite clope (se soigne de 10) → Capoeira 12 |
-| Boss | Colonel Eclatax (niveau 3) | Plante | 280 | Cycle de 6 tours : Il était une fois dans mon potager (pose le **Royaume du Colonel** : aucun soin possible) → Pomme de terrax 3 × 3 → Pomme de terrax 3 × 3 → Pomme de terrax 3 × 3 → Ptite clope (se soigne de 15) → Taffe de foufou batardddd 20 |
+| Boss | Colonel Eclatax (niveau 3) | Plante | 280 | Cycle de 6 tours : Il était une fois dans mon potager (pose le **Royaume du Colonel** : soins divisés par deux) → Pomme de terrax 3 × 3 → Pomme de terrax 3 × 3 → Pomme de terrax 3 × 3 → Ptite clope (se soigne de 15) → Taffe de foufou batardddd 20 |
 
 Statuts infligés (tirages de l'adversaire, pas doublés par CLAUDE.md) :
 
@@ -341,9 +341,11 @@ Seuls les **trinkets équipés** comptent (pas les objets). Un trinket compte po
 |---|---|---|
 | 1 | Pompette | +10 % dégâts |
 | 2 jusqu'au seuil | Bourré | +25 % dégâts |
-| seuil (3) et plus | Cuite | +50 % dégâts, et **Gueule de bois** au combat suivant (−1 taille de main ; −2 pour Louis) |
+| seuil (3) et plus | Cuite | +50 % dégâts, mais **50 % de chances de rater chaque sort** et **PV max ×0,67** (−33 %) ; et **Gueule de bois** au combat suivant (−1 taille de main ; −2 pour Louis) |
 - Modifiée par : Foie d'ingénieur (Cuite et Gueule de bois à 5 : Bourré de 2 à 4), Ptit Sat ? (+10 % dégâts par point d'Ivresse, **en plus** du palier), la clope (−1 Ivresse).
 - Implémentation (étape 3) : la Gueule de bois s'active au début du combat suivant (quels que soient les nœuds entre les deux : Sieste, shop…) et dure tout ce combat ; une à chaque fois qu'on franchit le seuil vers le haut (l'Ivresse continue de monter au-delà, sans nouvelle Gueule de bois ni bonus supplémentaire) ; aucune pendant le boss final (il n'y a pas de suivant).
+- **Malus de la Cuite** (chiffres dans `core.DrunkTier`) : tant qu'on est en Cuite, chaque **sort** joué a 50 % de chances de rater (tirage simple, pas doublé par CLAUDE.md). Un sort raté ne fait aucun dégât, son pouvoir ne se déclenche pas, il part à la défausse et n'est pas rejoué par l'Espace de dimension n ; le Shot de Jäger n'est pas consommé et attend le prochain sort. Les rejeux de l'Espace ne ratent jamais. Les soins, terrains et objets ne ratent pas.
+- Les **PV max sont multipliés par 0,67** pendant la Cuite (multiplicateur final, après les autres bonus). En entrant en Cuite, les PV redescendent au nouveau plafond (sauf soins non plafonnés, Ross) ; en sortant de la Cuite (clope, fin du combat), le plafond revient mais pas les PV perdus. La clope soigne **avant** de retirer l'Ivresse : en Cuite au plafond, son soin est perdu.
 - Avec la carte (environ 18 combats par run), la Gueule de bois, Foie d'ingénieur et Ptit Sat ? deviennent réellement utiles.
 
 ### Clopes
@@ -570,7 +572,7 @@ combat (le **Royaume du Colonel**, plante), au début de chacun de ses cycles : 
 | Hypercube misogyne | Cabinet psy scintillant | géométrique | adversaire +15 % dégâts |
 | Gobelin | Clairière d'adolescent de base | plante | −1 taille de main *(provisoire)* |
 | Engeance des cookies | Le canapé | neutre | aucun |
-| Colonel Eclatax (posé en combat) | Royaume du Colonel | plante | **aucun soin** : tous les soins du joueur sont bloqués (cartes, objets, clopes, statuts), le journal l'annonce |
+| Colonel Eclatax (posé en combat) | Royaume du Colonel | plante | **soins ÷ 2** : tous les soins du joueur sont divisés par deux (cartes, objets, clopes, statuts, arrondi au PV le plus proche), le journal l'annonce |
 
 ## Choomies (monnaie)
 - **15 Choomies** au début de la partie. Gagnés à chaque victoire : commun 12-18, élite 30-40, boss 80-100
@@ -640,8 +642,7 @@ Reste : transitions d'écran ; vrais sons des statuts ; vrais sprites des person
 - Couleur de rareté et d'élément partout.
 
 ## Questions ouvertes
-- **[À DÉCIDER]** Royaume du Colonel (terrain du boss du niveau 3, aucun soin possible) : la clope soigne-t-elle quand même ?
-- **[À DÉCIDER]** Royaume du Colonel : un soin bloqué est-il gaspillé (carte ou objet consommé pour rien), ou faut-il empêcher de le jouer sur ce terrain ?
+- **[À DÉCIDER]** Cuite : la clope devrait-elle dessoûler **avant** de soigner (sinon, en Cuite au plafond de PV, ses +5 PV sont perdus) ? *Provisoire : elle soigne d'abord, comme avant.*
 - **[À DÉCIDER]** Noms des variantes de Choomah (provisoires : « Choomah pressé », « Choomah costaud »).
 - **[À DÉCIDER]** Nom du vendeur du shop et sa réplique d'accueil. Il a un sprite (ébauche : bonnet, barbe, clope au bec) et il fume.
 - **[À DÉCIDER]** Dave : son soin profite-t-il des bonus de soin (efficacité, Ross) ou est-il brut ? *Provisoire : il en profite.*
@@ -657,6 +658,7 @@ Reste : transitions d'écran ; vrais sons des statuts ; vrais sprites des person
 - **[À DÉCIDER]** CMS : « +50 % dégâts » = sorts seulement, ou aussi objets et trinkets ? *Provisoire : +50 % sur les dégâts élémentaires (sorts et Gaz du bat Inf), pas sur les dégâts bruts (Plan du campus, Pichet vide).*
 
 ### Tranchées
+- ~~Royaume du Colonel : clopes et soins gaspillés~~ → plus de blocage : sur le Royaume du Colonel, tous les soins du joueur (clopes comprises) sont divisés par deux ; un soin n'est donc jamais gaspillé.
 - ~~Plan V3 (stats)~~ → six stats (FOR, INT, ESP, DEF, RES, CHA) pour le joueur et les adversaires (section « Stats »). La RES s'applique aussi aux statuts « à coup sûr » ; critique ×1,5 ; +2 points de stats et +25 PV max après chaque boss ; Frederic BLC 2 partout ; adversaires +1 FOR et +1 DEF par niveau (pas les boss) ; sorts GLITCH : la meilleure stat offensive ; CMS inchangé pour l'instant ; Gaz du bat Inf sans GLITCH. Interprétations validées : coup adverse = (déclaré × niveau + FOR) × multiplicateurs × critique − DEF, minimum 1, coup par coup ; critique sur les sorts multipliés (et les coups adverses) ; dégâts élémentaires des objets sans stat ni critique ; rejeu = ×0,5 avant la DEF ; ESP sur les cartes et objets à PV fixes ; INT du joueur pour tous ses statuts ; boss sans scaling de stats ; Carte basique et Moindre carré comptent leur stat eux-mêmes ; Berceuse 2 × ESP sans ESP en plus ; Contre-exemple 1 + ⌊INT ÷ 3⌋ ; nouveaux objets communs ; touches C et A. Alien de Sassy : familier de 20 PV, 25 % des attaques le visent, assommé à 0 PV jusqu'au combat suivant, ni DEF ni statuts. Légendaires : cartes tirées selon leur rareté, poids des Légendaires et des secrets à 1. Cartes mortes hors de la taille de main.
 - ~~Qui bat qui des nouveaux éléments~~ → Géométrique > Algébrique > Spirituel > Géométrique, GLITCH bat tout (règle du code, `model.Element`).
 - ~~Prix des cartes au shop~~ → selon la rareté de la carte.

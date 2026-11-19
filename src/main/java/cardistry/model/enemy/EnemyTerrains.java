@@ -99,7 +99,7 @@ public final class EnemyTerrains {
 
     public static TerrainCard terrainColonel() {
         return new TerrainCard("Royaume du Colonel", NATURE, COMMON)
-                .withEffect(TerrainCard.Effect.NO_HEALING, "aucun soin possible dans le royaume du Colonel");
+                .withEffect(TerrainCard.Effect.NO_HEALING, "presque aucun soin possible dans le royaume du Colonel");
     }
 
 }

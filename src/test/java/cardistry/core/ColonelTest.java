@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-/** Colonel Eclatax (boss du niveau 3) : son potager pose le Royaume du Colonel, où aucun soin ne passe. */
+/** Colonel Eclatax (boss du niveau 3) : son potager pose le Royaume du Colonel, où les soins sont divisés par deux. */
 class ColonelTest {
 
     private static final double DELTA = 1e-9;
@@ -68,15 +68,15 @@ class ColonelTest {
     }
 
     @Test
-    void aucunSoinDansLeRoyaumeDuColonel() {
+    void soinsDivisesParDeuxDansLeRoyaumeDuColonel() {
         setUp(EnemyTerrains.terrainColonel());
         playHeal();
-        assertEquals(80, state.player().hp(), DELTA, "carte de soin bloquée");
+        assertEquals(85, state.player().hp(), DELTA, "carte de soin : 10 ÷ 2 = 5");
+        assertTrue(events.contains(new GameEvent.Healed(state.player(), 5, 0.5)), "l'événement porte le ×0,5");
         engine.submit(new Action.Smoke());
-        assertEquals(80, state.player().hp(), DELTA, "clope bloquée aussi (question ouverte)");
-        assertTrue(events.stream().noneMatch(GameEvent.Healed.class::isInstance));
+        assertEquals(88, state.player().hp(), DELTA, "clope : 5 ÷ 2 = 2,5, arrondi à 3");
         assertTrue(events.stream().anyMatch(e -> e instanceof GameEvent.AbilityTriggered a
-                && a.message().contains("Royaume du Colonel")), "le journal annonce le soin bloqué");
+                && a.message().contains("Royaume du Colonel")), "le journal annonce le soin réduit");
     }
 
     @Test
