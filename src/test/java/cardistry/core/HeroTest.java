@@ -46,6 +46,21 @@ class HeroTest {
         engine.start();
     }
 
+    /** Première seed où l'alien ne rate pas son premier tour (il ne fume pas de joint). */
+    private long seedOuLAlienFrappe() {
+        for (long seed = 0; ; seed++) {
+            events.clear();
+            setUp(HeroRegistry.SASSY, seed, WATER, List.of(spell(FIRE, 10)), enemy(FIRE, 500));
+            engine.startTurn();
+            boolean joint = events.stream().anyMatch(e -> e instanceof GameEvent.AbilityTriggered a
+                    && a.message().contains("joint"));
+            if (!joint) {
+                events.clear();
+                return seed;
+            }
+        }
+    }
+
     /** Retire la CHA du personnage : aucun coup critique, dégâts exacts. */
     private void noCrit() {
         state.playerStats().add(cardistry.core.stats.StatModifier.flat(cardistry.core.stats.StatType.LUCK,
@@ -218,16 +233,13 @@ class HeroTest {
                 assertEquals(500 - 4, state.currentEnemy().hp(), DELTA);
             }
         }
-        // 10 % de 400 = 40 attendus.
-        assertTrue(misses > 20 && misses < 65, "ratés : " + misses + "/" + seeds);
+        // 30 % de 400 = 120 attendus.
+        assertTrue(misses > 90 && misses < 150, "ratés : " + misses + "/" + seeds);
     }
 
     @Test
     void sassyAlienSAjouteAuSortDuJoueur() {
-        long seed = 0;
-        while (new Rng(seed).nextDouble() < HeroRegistry.ALIEN_MISS_CHANCE) {
-            seed++;
-        }
+        long seed = seedOuLAlienFrappe();
         setUp(HeroRegistry.SASSY, seed, WATER, List.of(spell(FIRE, 10)), enemy(FIRE, 500));
         noCrit();
         engine.startTurn();
@@ -237,10 +249,7 @@ class HeroTest {
 
     @Test
     void sassyAlienPeutAcheverLAdversaire() {
-        long seed = 0;
-        while (new Rng(seed).nextDouble() < HeroRegistry.ALIEN_MISS_CHANCE) {
-            seed++;
-        }
+        long seed = seedOuLAlienFrappe();
         setUp(HeroRegistry.SASSY, seed, WATER, List.of(spell(FIRE, 10)), enemy(FIRE, 3));
         assertFalse(engine.startTurn(), "l'adversaire meurt au début du tour : rien à jouer");
         assertTrue(engine.isOver() && state.isWon());
@@ -249,7 +258,7 @@ class HeroTest {
     @Test
     void statsDeBaseDesPersonnages() {
         java.util.Map<Hero, int[]> expected = java.util.Map.of(
-                HeroRegistry.LOUIS, new int[] {3, 2, 0, 1, 1, 1},
+                HeroRegistry.LOUIS, new int[] {3, 2, 1, 3, 1, 1},
                 HeroRegistry.DAVE, new int[] {2, 3, 1, 1, 1, 1},
                 HeroRegistry.SASSY, new int[] {2, 0, 2, 2, 2, 1},
                 HeroRegistry.FREDERIC, new int[] {2, 2, 2, 2, 2, 2});
@@ -260,7 +269,7 @@ class HeroTest {
                 assertEquals(values[i], game.playerStats().get(types.get(i)), DELTA, hero.name() + " " + types.get(i));
             }
             int total = java.util.Arrays.stream(values).sum();
-            int points = hero == HeroRegistry.FREDERIC ? 12 : hero == HeroRegistry.LOUIS ? 8 : 9;
+            int points = hero == HeroRegistry.FREDERIC ? 12 : hero == HeroRegistry.LOUIS ? 11 : 9;
             assertEquals(points, total, hero.name());
         });
     }

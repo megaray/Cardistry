@@ -206,6 +206,123 @@ class DrunkennessTest {
         assertEquals(200 - 11, state.currentEnemy().hp(), 1e-9);
     }
 
+    // --- Cuite : sorts ratés et PV max réduits ---
+
+    /** Un adversaire solide (le sort ne le tue pas) et deux sorts en main, sur {@code terrain}. */
+    private void setUpSturdy(long seed, TerrainCard terrain) {
+        EventBus bus = new EventBus();
+        events.clear();
+        bus.subscribe(events::add);
+        state = new GameState(new Player(100), List.of(new Enemy("E0", FIRE, 1000, 5), new Enemy("E1", FIRE, 20, 5)),
+                terrain, List.of(new SpellCard("Tsunami", WATER, 10, Rarity.COMMON),
+                        new SpellCard("Tsunami", WATER, 10, Rarity.COMMON)), new Stats());
+        engine = new CombatEngine(state, new CardPool(), new Rng(seed), bus, new LootTable(List::of));
+    }
+
+    private static TerrainCard plain() {
+        return new TerrainCard("EPFL", FIRE, Rarity.COMMON);
+    }
+
+    @Test
+    void laCuiteReduitLesPvMaxDUnTiers() {
+        setUp(2);
+        drinkTimes(2);
+        assertEquals(100, state.maxHp(), 1e-9, "Bourré : PV max intacts");
+        drinkTimes(1);
+        assertEquals(DrunkTier.WASTED, state.drunkTier());
+        assertEquals(67, state.maxHp(), 1e-9, "100 × 0,67");
+        assertEquals(67, state.player().hp(), 1e-9, "les PV redescendent au nouveau plafond");
+    }
+
+    @Test
+    void lesPvMaxReviennentQuandOnSortDeLaCuite() {
+        setUp(2);
+        drinkTimes(3);
+        assertEquals(ActionResult.FREE_ACTION, engine.submit(new Action.Smoke())); // −1 Ivresse : Bourré
+        assertEquals(DrunkTier.DRUNK, state.drunkTier());
+        assertEquals(100, state.maxHp(), 1e-9);
+        assertEquals(67, state.player().hp(), 1e-9,
+                "les PV perdus ne reviennent pas ; la clope soigne avant de dessoûler, donc au plafond de 67 (+0)");
+    }
+
+    @Test
+    void lesPvMaxReviennentALaFinDuCombat() {
+        setUp(2);
+        drinkTimes(3);
+        engine.submit(new Action.PlayCard(0)); // tue E0 ou rate
+        while (state.currentEnemy().name().equals("E0")) {
+            engine.submit(new Action.DrawCard());
+            engine.submit(new Action.PlayCard(0));
+        }
+        assertEquals(100, state.maxHp(), 1e-9);
+    }
+
+    @Test
+    void enCuiteUnSortRateUneFoisSurDeux() {
+        int missed = 0;
+        int seeds = 200;
+        for (long seed = 1; seed <= seeds; seed++) {
+            setUpSturdy(seed, plain());
+            drinkTimes(3);
+            engine.submit(new Action.PlayCard(0));
+            if (count(GameEvent.SpellMissed.class) == 1) {
+                missed++;
+                assertEquals(1000, state.currentEnemy().hp(), 1e-9, "raté : aucun dégât");
+                assertEquals(0, count(GameEvent.SpellHit.class));
+            } else {
+                assertTrue(state.currentEnemy().hp() < 1000, "touché : des dégâts");
+            }
+        }
+        assertTrue(missed > seeds * 0.35 && missed < seeds * 0.65, "environ 50 % de ratés : " + missed + "/" + seeds);
+    }
+
+    @Test
+    void sansCuiteAucunSortNeRate() {
+        for (long seed = 1; seed <= 50; seed++) {
+            setUpSturdy(seed, plain());
+            drinkTimes(2); // Bourré
+            engine.submit(new Action.PlayCard(0));
+            assertEquals(0, count(GameEvent.SpellMissed.class));
+        }
+    }
+
+    @Test
+    void unSortRateNEstPasRejoueSurLEspace() {
+        boolean sawMiss = false;
+        boolean sawHit = false;
+        for (long seed = 1; seed <= 50 && !(sawMiss && sawHit); seed++) {
+            setUpSturdy(seed, new TerrainCard("Espace de dimension n", cardistry.model.Element.ALGEBRAIC, Rarity.RARE)
+                    .withEffect(TerrainCard.Effect.REPLAY, "x"));
+            drinkTimes(3);
+            engine.submit(new Action.PlayCard(0));
+            if (count(GameEvent.SpellMissed.class) == 1) {
+                sawMiss = true;
+                assertTrue(state.echoes().isEmpty(), "raté : pas de rejeu");
+            } else {
+                sawHit = true;
+                assertEquals(1, state.echoes().size(), "touché : rejoué au tour suivant");
+            }
+        }
+        assertTrue(sawMiss && sawHit);
+    }
+
+    @Test
+    void unSortRateGardeLeShotDeJagerPourLeSuivant() {
+        for (long seed = 1; seed <= 50; seed++) {
+            setUpSturdy(seed, plain());
+            drinkTimes(2);
+            engine.give(cardistry.items.ItemRegistry.item("shot-de-jager")); // +1 Ivresse : Cuite
+            engine.submit(new Action.UseItem(0));
+            assertEquals(DrunkTier.WASTED, state.drunkTier());
+            engine.submit(new Action.PlayCard(0));
+            if (count(GameEvent.SpellMissed.class) == 1) {
+                assertTrue(state.nextSpellBoost().isPresent(), "le ×2 attend le prochain sort");
+                return;
+            }
+        }
+        throw new AssertionError("aucune seed ne rate");
+    }
+
     @Test
     void toutesLesStatsDeDegatsEtDeSoinExistent() {
         for (cardistry.model.Element element : cardistry.model.Element.values()) {

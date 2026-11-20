@@ -28,7 +28,10 @@ public final class TerrainCard extends Card {
          * EPFL : pendant 3 tours, valeurs du joueur doublées (ses bonus ×2), PV actuels ×2 à
          * l'arrivée et ÷2 au départ ; puis retour au Dojo.
          */
-        EPFL
+        EPFL,
+
+        /** Terrain du boss 3 : le joueur ne peut pas se soigner (ou peu). */
+        NO_HEALING
     }
 
     private List<StatModifier> bonuses = List.of();

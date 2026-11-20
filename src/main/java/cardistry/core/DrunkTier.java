@@ -14,6 +14,11 @@ public enum DrunkTier {
     /** Au seuil de Gueule de bois (3 par défaut, 5 avec Foie d'ingénieur) et au-delà. */
     WASTED("Cuite", 0.50);
 
+    /** Chance qu'un sort rate pendant la Cuite. */
+    public static final double WASTED_MISS_CHANCE = 0.50;
+    /** PV max pendant la Cuite (×0,67 = −33 %). */
+    public static final double WASTED_MAX_HP_FACTOR = 0.67;
+
     private final String displayName;
     private final double damageBonus;
 

@@ -860,6 +860,82 @@ local function choomahCostaud(c, pose)
   choomahLips(u, 26, 32, 7, 3, pose.attack == 2 or pose.hurt)
 end
 
+-- ------------------------------------------------------------------ Colonel Eclatax (boss du niveau 3, plante)
+-- Officier d'opérette : haute casquette verte à visière noire et insigne doré, grosse moustache noire
+-- recourbée, favoris, joues roses, sourire satisfait ; veste verte à épaulettes rouges frangées d'or,
+-- col blanc et cravate noire, médailles. À l'attaque (Pomme de terrax), il lance une pomme de terre.
+
+local function colonel(c, pose)
+  local bob = pose.alt and 1 or 0
+  -- bras (derrière le corps) : à droite, le long du corps
+  c:ellipse(51, 50, 6, 12, "v"); c:disc(52, 61, 3, "s")
+  if pose.attack then
+    -- bras tendu vers le joueur, pomme de terre en vol
+    c:ellipse(12, 46, 9, 5, "v"); c:disc(4, 46, 3, "s")
+    local px = pose.attack == 2 and -2 or 3
+    c:ellipse(px, 38, 4, 3, "n"); c:px(px - 1, 37, "N"); c:px(px + 2, 39, "N"); c:px(px, 39, "N")
+  else
+    c:ellipse(13, 50, 6, 12, "v"); c:disc(12, 61, 3, "s")
+  end
+  -- veste verte, épaulettes rouges à franges dorées
+  c:ellipse(32, 44, 19, 6, "g"); c:rect(13, 44, 39, 20, "g")
+  c:vline(32, 50, 63, "v"); c:vline(19, 50, 63, "v"); c:vline(45, 50, 63, "v")
+  c:ellipse(16, 41, 7, 3, "r"); c:ellipse(48, 41, 7, 3, "r")
+  for x = 10, 22, 2 do c:vline(x, 43, 45, "Y") end
+  for x = 42, 54, 2 do c:vline(x, 43, 45, "Y") end
+  -- col blanc, cravate noire, revers rouges
+  c:tri(25, 38, 39, 38, 32, 49, "6")
+  c:tri(23, 38, 28, 38, 27, 45, "r"); c:tri(36, 38, 41, 38, 37, 45, "r")
+  c:rect(31, 40, 3, 3, "1"); c:tri(30, 43, 34, 43, 32, 50, "1")
+  -- boutons dorés et médailles
+  c:px(27, 53, "Y"); c:px(27, 58, "Y"); c:px(37, 53, "Y"); c:px(37, 58, "Y")
+  c:rect(39, 47, 2, 2, "R"); c:rect(42, 47, 2, 2, "b"); c:rect(45, 47, 2, 2, "Y")
+  c:px(40, 49, "Y"); c:px(43, 49, "Y"); c:px(46, 49, "y")
+  local h = c:shift(0, bob)
+  -- cou, visage, gros menton carré en avant, oreille (côté droit : il regarde vers la gauche)
+  h:rect(29, 32, 9, 6, "s"); h:hline(30, 36, 37, "o")
+  h:ellipse(31, 24, 11, 10, "s")
+  h:ellipse(29, 32, 9, 5, "s"); h:rect(21, 29, 16, 4, "s")
+  h:hline(24, 33, 37, "o"); h:px(28, 35, "o")
+  h:disc(42, 24, 3, "s"); h:px(42, 24, "o")
+  -- favoris noirs
+  h:rect(38, 18, 3, 6, "1")
+  -- joues roses
+  h:ellipse(36, 27, 3, 2, "p"); h:ellipse(22, 26, 2, 1, "p")
+  -- yeux et sourcils
+  if pose.hurt then
+    xEye(h, 23, 19, 3, "1"); xEye(h, 32, 19, 3, "1")
+  else
+    h:rect(24, 21, 2, 2, "1"); h:rect(33, 21, 2, 2, "1")
+    h:line(23, 19, 27, 20, "1"); h:line(32, 20, 36, 19, "1")
+  end
+  -- nez rond
+  h:ellipse(28, 25, 2, 2, "s"); h:px(26, 26, "o")
+  -- bouche, sur le menton : sourire satisfait, ouverte quand il crie ou qu'il a mal
+  if pose.hurt or pose.attack == 2 then
+    h:ellipse(29, 33, 3, 2, "1"); h:hline(27, 31, 32, "6")
+  else
+    h:hline(25, 32, 32, "6"); h:hline(26, 31, 33, "6"); h:hline(26, 31, 34, "o")
+  end
+  -- grosse moustache en guidon : épaisse, reflets gris, pointes enroulées vers le haut
+  local tip = pose.alt and -1 or 0
+  h:ellipse(24, 29, 5, 2, "1"); h:ellipse(33, 29, 5, 2, "1"); h:rect(27, 27, 5, 3, "1")
+  h:hline(21, 25, 28, "2"); h:hline(32, 36, 28, "2"); h:px(29, 27, "2")
+  h:line(19, 30, 16, 28 + tip, "1", 2); h:arc(15, 26 + tip, 2, 2, 0, 270, "1")
+  h:line(37, 30, 40, 28 + tip, "1", 2); h:arc(42, 26 + tip, 2, 2, 270, 540, "1")
+  -- haute casquette verte, plateau qui monte vers l'avant (la gauche)
+  h:ellipse(32, 11, 14, 5, "g"); h:ellipse(25, 6, 10, 5, "g"); h:tri(15, 9, 22, 1, 40, 9, "g")
+  h:arc(25, 6, 10, 5, 190, 300, "G"); h:hline(20, 42, 11, "v")
+  -- bandeau rouge, cordon doré, visière noire brillante
+  h:rect(18, 12, 28, 3, "r"); h:hline(18, 45, 15, "Y")
+  h:ellipse(22, 17, 9, 2, "1"); h:hline(16, 22, 16, "3")
+  -- insigne doré (feuilles)
+  h:tri(25, 10, 28, 3, 31, 10, "Y"); h:tri(22, 10, 24, 5, 27, 10, "y"); h:tri(29, 10, 32, 5, 34, 10, "y")
+  h:px(28, 8, "6")
+  -- cheveux noirs sous la casquette, derrière l'oreille
+  h:rect(41, 16, 4, 5, "1")
+end
+
 -- ------------------------------------------------------------------ placeholders
 -- Clarence et le boss sont dessinés à la main : une silhouette « ? » en attendant, avec le
 -- seul tag idle. Remplacer le dessin dans le .aseprite (le script n'y touchera plus).
@@ -889,6 +965,7 @@ return {
   gobelinSprite(), standard("engeance-des-cookies", engeance), standard("nortin", nortin), standard("zo", zo),
   standard("choomah", choomah), standard("choomah-presse", choomahPresse),
   standard("choomah-costaud", choomahCostaud),
+  standard("colonel", colonel),
   placeholder("clarence", false), placeholder("boss", true),
 }
 

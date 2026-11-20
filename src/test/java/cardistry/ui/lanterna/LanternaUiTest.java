@@ -311,7 +311,7 @@ class LanternaUiTest {
     void partieCompleteJusquAEcranDeFin() throws IOException {
         open(80, 24);
         EventBus bus = new EventBus();
-        Run engine = new Run(7, java.util.Set.of(), bus);
+        Run engine = new Run(1, java.util.Set.of(), bus);
         bus.subscribe(ui::onEvent);
 
         press(KeyType.Enter); // titre
@@ -345,7 +345,7 @@ class LanternaUiTest {
         assertTrue(engine.isOver());
         String text = dump("07-fin");
         assertTrue(text.contains(engine.state().isWon() ? "VICTOIRE" : "DÉFAITE"));
-        assertTrue(text.contains("--seed 7"));
+        assertTrue(text.contains("--seed 1"));
     }
 
     // --- Objets, trinkets, récompenses ---
@@ -986,7 +986,7 @@ class LanternaUiTest {
         String mine = dump("65-fiche-joueur");
         assertTrue(mine.contains("FOR 5"), mine);
         assertTrue(mine.contains("personnage +3, Donut Musclé +2"), mine);
-        assertTrue(mine.contains("DEF −1"), mine); // 1 − 2 (Bord d'autoroute)
+        assertTrue(mine.contains("DEF 1"), mine); // 3 − 2 (Bord d'autoroute)
         assertTrue(mine.contains("terrain Bord d'autoroute −2"), mine);
         type("c");
         waitFor(() -> !screen().contains("Fiche de Louis"));
@@ -1155,7 +1155,7 @@ class LanternaUiTest {
         assertTrue(text.contains("Boss vaincu"), text);
         assertTrue(text.contains("2 points de stats à placer"), text);
         assertTrue(text.contains("FOR 3"), text);
-        assertTrue(text.contains("DEF 1"), text);
+        assertTrue(text.contains("DEF 3"), text);
         assertTrue(text.contains("+25 pour toute la partie"), text);
         type("6");
         assertEquals(cardistry.core.stats.StatType.LUCK,

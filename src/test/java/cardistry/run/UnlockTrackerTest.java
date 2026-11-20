@@ -200,7 +200,10 @@ class UnlockTrackerTest {
         run.state().currentEnemy().takeDamage(run.state().currentEnemy().hp() - 3);
         run.state().player().takeDamage(run.state().player().hp() - 1);
         run.startTurn();
-        run.submit(new Action.DrawCard());
+        // Le Colonel (boss 3) ouvre par son potager, qui ne frappe pas : on pioche jusqu'à son premier coup.
+        for (int turn = 0; turn < 3 && !run.state().isLost(); turn++) {
+            run.submit(new Action.DrawCard());
+        }
         assertTrue(run.state().isLost());
     }
 

@@ -171,7 +171,7 @@ public final class EnemyRegistry {
                 .behavior(EnemyBehavior.always(EnemyMove.of("regard", "Regard", "Clarence te regarde."))));
         common(all, SEAU, "Seau de fuite", WATER, 26, seau());
         elite(all, VAFI, "Vafi", FIRE, 55, vafi(), 0);
-        elite(all, PENEU, "Le Peneu", NEUTRAL, 90, peneu(), 0.2);
+        elite(all, PENEU, "Le Peneu", NEUTRAL, 90, peneu(), 0.1);
         elite(all, TREX, "T-Rex défoncé", NATURE, 65, EnemyBehavior.always(EnemyMove.of("morsure", "Morsure",
                 "Bras trop courts : 30 % de rater ; quand il rate, fringale (il se soigne)",
                 new Hit(13, 1, 0, 0.30, 8))), 0);
@@ -189,7 +189,8 @@ public final class EnemyRegistry {
                 .hp(230)
                 .sprite("zo")
                 .behavior(zo()));
-        boss(all, 10, NATURE, 25000, 10, 22);
+        all.put(bossId(3), () -> Enemy.builder(bossId(3), "Colonel Eclatax", NATURE, EnemyRank.BOSS)
+                .hp(280).sprite("colonel").behavior(colonel()));
         return all;
     }
 
@@ -334,11 +335,11 @@ public final class EnemyRegistry {
         };
     }
 
-    /** Rebond (passif) et « Crevaison », qui monte de 2 à chaque utilisation. */
+    /** Rebond (passif) et « Crevaison », qui monte de 1 à chaque utilisation. */
     private static EnemyBehavior peneu() {
         return self -> EnemyMove.of("crevaison", "Crevaison",
-                "Monte à chaque utilisation. Rebond : te renvoie 20 % des dégâts reçus",
-                Hit.of(6 + 2 * self.uses("crevaison")));
+                "Monte à chaque utilisation. Rebond : te renvoie 10 % des dégâts reçus",
+                Hit.of(6 + 1 * self.uses("crevaison")));
     }
 
     private static EnemyBehavior etudiant() {
@@ -389,6 +390,30 @@ public final class EnemyRegistry {
             case 4 -> regen;
             case 5 -> capoeira;
             default -> coupTeub;
+        };
+    }
+
+
+    private static EnemyBehavior colonel() {
+        EnemyMove pommeDeTerre = EnemyMove.of("pomme-de-terre", "Pomme de terrax", "Et encore une pomme de terre",
+                Hit.of(3,3));
+        EnemyMove regen = EnemyMove.of("petite-clope", "Ptite clope",
+                "Il se fait une petite clope",
+                new MoveEffect.HealSelf(15));
+        EnemyMove taffeFoufou = EnemyMove.of("taffe-de-foufou-batard", "Taffe de foufou batardddd", "N'expirez pas...",
+                Hit.of(20));
+        EnemyMove potager = EnemyMove.of("potager", "Il était une fois dans mon potager", "[MENACE DETECTEE]",
+                new MoveEffect.SetTerrain(EnemyTerrains::terrainColonel));
+
+
+        return self -> switch (self.actions() % 6) {
+            case 0 -> potager;
+            //case 1 -> pommeDeTerre;
+            //case 2 -> pommeDeTerre;
+            //case 3 -> pommeDeTerre;
+            case 4 -> regen;
+            case 5 -> taffeFoufou;
+            default -> pommeDeTerre;
         };
     }
 

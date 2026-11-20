@@ -938,7 +938,7 @@ public final class GameState {
 
     private static final String DRUNK_SOURCE = "ivresse";
 
-    /** Applique le bonus de dégâts du palier d'Ivresse actuel (stats calculées : on retire puis on repose). */
+    /** Applique le bonus de dégâts du palier d'Ivresse actuel (stats calculées : on retire puis on repose). Et on applique le malus de la cuite */
     private void refreshDrunkTier() {
         playerStats.removeBySource(DRUNK_SOURCE);
         double bonus = drunkTier().damageBonus();
@@ -947,6 +947,15 @@ public final class GameState {
                 playerStats.add(StatModifier.percent(stat, bonus, DRUNK_SOURCE));
             }
         }
+
+        if (drunkTier() == DrunkTier.WASTED) {
+            playerStats.add(StatModifier.multiply(StatType.MAX_HP, DrunkTier.WASTED_MAX_HP_FACTOR, DRUNK_SOURCE));
+            int over = player.hp() - (int) maxHp();
+            if (over > 0 && !healingUncapped()) {
+                player.takeDamage(over); // on redescend au nouveau plafond
+            }
+        }
+
     }
 
 

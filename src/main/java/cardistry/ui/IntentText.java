@@ -47,6 +47,7 @@ public final class IntentText {
                     : e.enemy().name() + " : " + e.move().name() + " — " + e.move().description();
             case cardistry.core.event.GameEvent.EnemyMissed e -> e.enemy().name() + " " + say(e.enemy(),
                     e.healed() > 0 ? "rate son coup et se soigne de " + num(e.healed()) + " PV" : "rate son coup");
+            case cardistry.core.event.GameEvent.SpellMissed miss -> "Trop cuit : " + miss.spell().name() + " rate sa cible !";
             case cardistry.core.event.GameEvent.DodgeReady e -> e.enemy().name() + " "
                     + say(e.enemy(), "esquivera ton prochain sort");
             case cardistry.core.event.GameEvent.EnemyDodged e -> e.enemy().name() + " " + say(e.enemy(), "esquive ton sort !");
@@ -120,6 +121,7 @@ public final class IntentText {
                     + num(state.hasEnemy() ? cardistry.core.CombatFormula.heal(heal.amount() * state.currentEnemy().damageScale(),
                             state.currentEnemy().stat(cardistry.core.stats.StatType.MIND), 1.0) : heal.amount());
             case MoveEffect.ChangeElement change -> "change d'élément";
+            case MoveEffect.SetTerrain set -> "pose le Royaume du Colonel";
             case MoveEffect.Inflict inflict -> (inflict.chance() < 1 ? percent(inflict.chance()) + " de " : "")
                     + cardistry.core.status.StatusType.byId(inflict.status()).displayName()
                     + (inflict.turns() > 0 ? " " + StatusText.turns(inflict.turns()) : "");

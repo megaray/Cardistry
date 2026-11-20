@@ -1,4 +1,6 @@
 package cardistry.model.enemy;
+import java.util.function.Supplier;
+import cardistry.model.card.TerrainCard;
 
 /**
  * Ce que fait une attaque adverse ({@link EnemyMove}). Données pures : le moteur les exécute dans
@@ -144,5 +146,11 @@ public sealed interface MoveEffect {
         public boolean isAttack() {
             return false;
         }
+    }
+
+
+    /** L'adversaire pose son propre terrain (comme une carte terrain jouée). */
+    record SetTerrain(Supplier<TerrainCard> terrain) implements MoveEffect {
+        @Override public boolean isAttack() { return false; }
     }
 }

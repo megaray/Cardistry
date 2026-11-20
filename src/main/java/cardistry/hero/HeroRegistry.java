@@ -23,7 +23,7 @@ public final class HeroRegistry {
     /** Dégâts bruts de l'alien, à chaque tour. */
     public static final double ALIEN_DAMAGE = 4;
     /** Chance que l'alien rate son tour (il fume un joint). */
-    public static final double ALIEN_MISS_CHANCE = 0.10;
+    public static final double ALIEN_MISS_CHANCE = 0.30;
     /** PV de l'alien. */
     public static final double ALIEN_HP = 20;
     /** Chance qu'une attaque adverse vise l'alien à la place de Sassy (tirage de l'adversaire). */
@@ -32,8 +32,8 @@ public final class HeroRegistry {
     public static final cardistry.model.Familiar.Spec ALIEN =
             new cardistry.model.Familiar.Spec("alien", "Alien", ALIEN_HP, ALIEN_TARGET_CHANCE);
 
-    // --- Stats de base (FOR, INT, ESP, DEF, RES, CHA) : 8 points, 12 pour Frederic BLC ---
-    public static final int[] LOUIS_STATS = {5, 2, 1, 3, 1, 1};
+    // --- Stats de base (FOR, INT, ESP, DEF, RES, CHA) : 11 points pour Louis, 9 pour Dave et Sassy, 12 pour Frederic BLC ---
+    public static final int[] LOUIS_STATS = {3, 2, 1, 3, 1, 1};
     public static final int[] DAVE_STATS = {2, 3, 1, 1, 1, 1};
     public static final int[] SASSY_STATS = {2, 0, 2, 2, 2, 1};
     public static final int[] FREDERIC_STATS = {2, 2, 2, 2, 2, 2};
@@ -60,7 +60,7 @@ public final class HeroRegistry {
             });
 
     public static final Hero SASSY = new Hero("sassy", "Sassy", "wadayatalkinabit",
-            "+30 PV max. À chaque tour, son alien (20 PV) inflige 4 dégâts à l'adversaire (10 % de chance qu'il"
+            "+30 PV max. À chaque tour, son alien (20 PV) inflige 4 dégâts à l'adversaire (30 % de chance qu'il"
                     + " fume un joint à la place). 25 % des attaques adverses le visent ; à 0 PV, il est assommé"
                     + " jusqu'au combat suivant.",
             with(stats("sassy", SASSY_STATS),

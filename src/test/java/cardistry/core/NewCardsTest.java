@@ -194,7 +194,7 @@ class NewCardsTest {
     }
 
     @Test
-    void somnifereEndortLAdversaireUnTour() {
+    void somnifereEndortLAdversaireDeuxTours() {
         enemy = new Enemy("Cible", Element.NEUTRAL, 100, 10);
         state = new GameState(new Player(100), List.of(enemy), new TerrainCard("Neutre", Element.NEUTRAL,
                 Rarity.COMMON), List.of(CardPool.somnifere()), new Stats());
@@ -203,6 +203,9 @@ class NewCardsTest {
         play();
         assertEquals(100, state.player().hp(), "endormi");
         assertEquals(100, enemy.hp(), "aucun dégât");
+        engine.startTurn();
+        engine.submit(new Action.DrawCard());
+        assertEquals(100, state.player().hp(), "toujours endormi (2e tour)");
         engine.startTurn();
         engine.submit(new Action.DrawCard());
         assertEquals(90, state.player().hp(), "réveillé");

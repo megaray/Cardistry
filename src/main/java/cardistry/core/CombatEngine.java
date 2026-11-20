@@ -1375,6 +1375,12 @@ public final class CombatEngine {
         Card card = state.removeFromHand(slot);
         boolean onSpace = state.terrain().effect() == TerrainCard.Effect.REPLAY;
         bus.publish(new GameEvent.CardPlayed(card));
+        if (card instanceof SpellCard spell && state.drunkTier() == DrunkTier.WASTED
+                && rng.nextDouble() < DrunkTier.WASTED_MISS_CHANCE) {
+            bus.publish(new GameEvent.SpellMissed(spell));
+            discard(spell); // raté : pas de dégâts, pas de pouvoir, pas de rejeu
+            return;
+        }
         resolveCard(card, 1.0);
         if (onSpace && !(card instanceof TerrainCard) && state.terrain().effect() == TerrainCard.Effect.REPLAY) {
             state.addEcho(card);
@@ -1633,6 +1639,11 @@ public final class CombatEngine {
                 enemy.changeElement(next);
                 bus.publish(new GameEvent.EnemyElementChanged(enemy, previous, next));
             }
+
+            case MoveEffect.SetTerrain set -> {
+                changeTerrain(set.terrain().get());
+            }
+
             case MoveEffect.Inflict inflict -> {
                 if (!inflict.afterHit() || run.landed) {
                     tryStatus(StatusTarget.PLAYER, StatusType.byId(inflict.status()), inflict.chance(),
@@ -1788,11 +1799,25 @@ public final class CombatEngine {
         return hpLost;
     }
 
+
+
+    /** Royaume du Colonel : les soins du joueur sont divisés par deux. */
+    private static final double COLONEL_HEAL_FACTOR = 0.5;
+
     /**
      * Soigne sans dépasser les PV max (sauf si les soins ne sont pas plafonnés) ; l'événement porte
      * les PV réellement rendus.
+     * Soins réduits sur certains terrains
      */
     private void healPlayer(double amount, double mult) {
+        if(state.terrain().effect() == TerrainCard.Effect.NO_HEALING){
+
+            /*return; // clopes autorisées ? voir Questions ouvertes*/
+            amount *= COLONEL_HEAL_FACTOR;
+            mult*= COLONEL_HEAL_FACTOR;
+            effects.announce("Heal réduit de moitié par " + state.terrain().name());
+        }
+
         Player player = state.player();
         double missing = Math.max(0, state.maxHp() - player.hp());
         double healed = Combatant.round(state.healingUncapped() ? amount : Math.min(amount, missing));

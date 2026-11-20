@@ -61,7 +61,7 @@ Valeurs ci-dessous au niveau 1 ; leurs stats sont dans « Stats des adversaires 
 | Commun | Clarence | Neutre | 1 | « Clarence te regarde. » N'attaque jamais. 3 % des combats communs ; 75 Choomies |
 | Commun | Seau de fuite | Eau | 26 | Ça goutte 2, 3, 4, 5 (le seau se remplit) ; au 5e tour Débordement 14, puis retour à zéro |
 | Élite | Vafi | Feu | 55 | Correction 8 ; tous les 3 tours, Série d'algèbre : une carte de ta main devient « Exercice 3b » (injouable pour ce combat) ; sous 50 % PV, Pause pétou (+12 PV, n'attaque pas), 2 fois max |
-| Élite | Le Peneu | Neutre | 90 | Rebond (passif) : renvoie 20 % des dégâts reçus, brut, sans jamais tuer ; Crevaison 6, +2 à chaque utilisation |
+| Élite | Le Peneu | Neutre | 90 | Rebond (passif) : renvoie 10 % des dégâts reçus, brut, sans jamais tuer ; Crevaison 6, +1 à chaque utilisation |
 | Élite | T-Rex défoncé | Plante | 65 | Morsure 13 ; bras trop courts : 30 % de rater, et il se soigne de 8 quand il rate (fringale) |
 | Élite | Étudiant post-examen | Eau | 60 | Larmes : 6, +3 par carte de moins que 5 dans ta main ; sous 50 % PV, Crise de nerfs : deux attaques par tour |
 | Commun | Gourou du Sat | Spirituel | 24 | Coup d'encens 4 ; tous les 3 tours, Regard fixe : t'hypnotise 1 tour (son coup suivant ×2) |
@@ -69,9 +69,9 @@ Valeurs ci-dessous au niveau 1 ; leurs stats sont dans « Stats des adversaires 
 | Commun | Hypercube misogyne | Géométrique | 25 | Tunnel topologique 5 ; tous les 3 tours, Célibat forcé (« ouin ouin ») 2 × 4 |
 | Commun | Gobelin | Plante | 22 | « 67 » (six seveeen) : 6 ou 7, chaque tour ; animation des deux mains et « SIX SEVEEEN ! » à l'écran |
 | Élite | Engeance des cookies | GLITCH | 60 | Défoncée au space cookie. Piège pâtissier 9 ; tous les 3 tours, Green out : t'endort (Fons 1 tour) ; une fois sous 50 % PV, Méditation triptyque : passe à un autre élément (tiré au hasard, ni neutre ni GLITCH) jusqu'à la fin du combat |
-| Boss | Nortin (niveau 1) | Neutre | 160 | Cycle de 4 tours : Bitch slap 8 → Esquive (70 % d'esquiver ton prochain sort, sinon Bitch slap) → Vol de trinket (20 % de te voler un trinket, rendu si tu le bats ; sans trinket : Bitch slap) → Hit in the nuts 16 |
-| Boss | Zo le StreMon (niveau 2) | Algébrique | 250 | Cycle de 6 tours : Coup de teub 8 → Coup de teub 8 → Un dernier p'tit verre (5 dégâts, +1 Ivresse pour toi) → Coup de teub 8 → P'tite clope (se soigne de 10) → Capoeira 12 |
-| Boss | Boss du niveau 3 (**nom à venir**) | Plante | 280 | Coup 10 ; toutes les 4 attaques, Grosse attaque 22 |
+| Boss | Nortin (niveau 1) | Neutre | 120 | Cycle de 4 tours : Bitch slap 8 → Esquive (70 % d'esquiver ton prochain sort, sinon Bitch slap) → Vol de trinket (20 % de te voler un trinket, rendu si tu le bats ; sans trinket : Bitch slap) → Hit in the nuts 16 |
+| Boss | Zo le StreMon (niveau 2) | Algébrique | 230 | Cycle de 6 tours : Coup de teub 8 → Coup de teub 8 → Un dernier p'tit verre (5 dégâts, +1 Ivresse pour toi) → Coup de teub 8 → P'tite clope (se soigne de 10) → Capoeira 12 |
+| Boss | Colonel Eclatax (niveau 3) | Plante | 280 | Cycle de 6 tours : Il était une fois dans mon potager (pose le **Royaume du Colonel** : soins divisés par deux) → Pomme de terrax 3 × 3 → Pomme de terrax 3 × 3 → Pomme de terrax 3 × 3 → Ptite clope (se soigne de 15) → Taffe de foufou batardddd 20 |
 
 Statuts infligés (tirages de l'adversaire, pas doublés par CLAUDE.md) :
 
@@ -173,14 +173,14 @@ comme un trinket qu'on ne peut ni perdre ni remplacer. Code : `hero.HeroRegistry
 |---|---|---|---|
 | **Louis** | 100 | MAN | +50 % de dégâts, tout le temps (tous éléments, additionné aux autres pourcentages, comme CMS). Aucun malus. |
 | **Dave** | 100 | Full skill Mr. Le Juge | Un sort du même élément que le terrain (ex. Boule de feu à l'EPFL) soigne des PV enlevés à l'adversaire. |
-| **Sassy** | 130 | wadayatalkinabit | À chaque début de tour, son alien inflige 4 dégâts bruts à l'adversaire, en plus de l'action du joueur. 10 % de chance que l'alien rate son tour et fume un joint à la place (aucun effet, pour le lore). L'alien est un **familier** de 20 PV (voir ci-dessous). |
+| **Sassy** | 130 | wadayatalkinabit | À chaque début de tour, son alien inflige 4 dégâts bruts à l'adversaire, en plus de l'action du joueur. 30 % de chance que l'alien rate son tour et fume un joint à la place (aucun effet, pour le lore). L'alien est un **familier** de 20 PV (voir ci-dessous). |
 | **Frederic BLC** | 100 | Aucune | Aucune compétence, mais des stats « parfaitement moyennes » : 2 partout (12 points au lieu de 8). |
 
-**Stats de base** (8 points pour Louis, 9 pour Dave et Sassy, 12 pour Frederic BLC) :
+**Stats de base** (11 points pour Louis, 9 pour Dave et Sassy, 12 pour Frederic BLC) :
 
 | Personnage | FOR | INT | ESP | DEF | RES | CHA | Logique |
 |---|---|---|---|---|---|---|---|
-| Louis | 3 | 2 | 0 | 1 | 1 | 1 | MAN : profil offensif |
+| Louis | 3 | 2 | 1 | 3 | 1 | 1 | MAN : profil offensif |
 | Dave | 2 | 3 | 1 | 1 | 1 | 1 | INT pour les statuts et les sorts algébriques/géométriques |
 | Sassy | 2 | 0 | 2 | 2 | 2 | 1 | Déjà 130 PV et l'alien : profil endurant |
 | Frederic BLC | 2 | 2 | 2 | 2 | 2 | 2 | Aucune capacité : le perso des builds de stats |
@@ -278,7 +278,7 @@ Valeurs au niveau 1 (FOR, INT, ESP, DEF, RES, CHA), code : `EnemyRegistry` (tabl
 | Engeance des cookies (élite) | 2 | 3 | 2 | 1 | 3 | 2 | Équilibrée et imprévisible |
 | Nortin | 3 | 1 | 1 | 2 | 3 | 1 | Test des stats |
 | Zo le StreMon | 4 | 4 | 2 | 3 | 4 | 2 | Exige un build |
-| Boss du niveau 3 | 5 | 3 | 3 | 4 | 5 | 3 | Fin de run |
+| Colonel Eclatax | 5 | 3 | 3 | 4 | 5 | 3 | Fin de run |
 
 Les boss ont une RES élevée pour qu'on ne puisse pas les enchaîner en Fons ou en Intox ; leurs stats seront à
 revoir avec leurs vrais noms et attaques.
@@ -341,9 +341,11 @@ Seuls les **trinkets équipés** comptent (pas les objets). Un trinket compte po
 |---|---|---|
 | 1 | Pompette | +10 % dégâts |
 | 2 jusqu'au seuil | Bourré | +25 % dégâts |
-| seuil (3) et plus | Cuite | +50 % dégâts, et **Gueule de bois** au combat suivant (−1 taille de main ; −2 pour Louis) |
+| seuil (3) et plus | Cuite | +50 % dégâts, mais **50 % de chances de rater chaque sort** et **PV max ×0,67** (−33 %) ; et **Gueule de bois** au combat suivant (−1 taille de main ; −2 pour Louis) |
 - Modifiée par : Foie d'ingénieur (Cuite et Gueule de bois à 5 : Bourré de 2 à 4), Ptit Sat ? (+10 % dégâts par point d'Ivresse, **en plus** du palier), la clope (−1 Ivresse).
 - Implémentation (étape 3) : la Gueule de bois s'active au début du combat suivant (quels que soient les nœuds entre les deux : Sieste, shop…) et dure tout ce combat ; une à chaque fois qu'on franchit le seuil vers le haut (l'Ivresse continue de monter au-delà, sans nouvelle Gueule de bois ni bonus supplémentaire) ; aucune pendant le boss final (il n'y a pas de suivant).
+- **Malus de la Cuite** (chiffres dans `core.DrunkTier`) : tant qu'on est en Cuite, chaque **sort** joué a 50 % de chances de rater (tirage simple, pas doublé par CLAUDE.md). Un sort raté ne fait aucun dégât, son pouvoir ne se déclenche pas, il part à la défausse et n'est pas rejoué par l'Espace de dimension n ; le Shot de Jäger n'est pas consommé et attend le prochain sort. Les rejeux de l'Espace ne ratent jamais. Les soins, terrains et objets ne ratent pas.
+- Les **PV max sont multipliés par 0,67** pendant la Cuite (multiplicateur final, après les autres bonus). En entrant en Cuite, les PV redescendent au nouveau plafond (sauf soins non plafonnés, Ross) ; en sortant de la Cuite (clope, fin du combat), le plafond revient mais pas les PV perdus. La clope soigne **avant** de retirer l'Ivresse : en Cuite au plafond, son soin est perdu.
 - Avec la carte (environ 18 combats par run), la Gueule de bois, Foie d'ingénieur et Ptit Sat ? deviennent réellement utiles.
 
 ### Clopes
@@ -497,7 +499,7 @@ deck de départ, les événements et les trinkets).
 | Peu commun | Tempête d'épines | plante | 15 ; 20 % de Bondage |
 | Peu commun | Moindre carré | algébrique | 1 à 30 + 2 × INT, tirage en ta faveur (le meilleur de deux avec CLAUDE.md) ; l'INT n'est pas ajoutée une seconde fois |
 | Peu commun | dist(PLAYER) | géométrique | 10 + étages parcourus |
-| Peu commun | Somnifère | spirituel | 0 ; Fons 1 tour à l'adversaire |
+| Peu commun | Somnifère | spirituel | 0 ; Fons 2 tours à l'adversaire |
 | Peu commun | Réveil brutal | neutre | 20 à un adversaire en Fons (et le réveille), sinon 8 |
 | Rare | Purification des Chakra | spirituel | 0 ; l'adversaire est hypnotisé pour ton prochain tour |
 | Rare | Pyromane | feu | 15, ×2 si l'adversaire brûle |
@@ -549,7 +551,9 @@ Code : `model.enemy.EnemyTerrains`. Chaque combat commence sur le **terrain de l
 sont **jamais** dans le pool (ni récompense, ni shop). Leurs malus touchent le joueur tant qu'il y reste : jouer
 une carte terrain, c'est « sortir de chez l'ennemi ». Arriver chez l'adversaire n'est pas un changement de terrain
 joué (M1 et Plan du campus ne se déclenchent pas). La règle existante s'applique : un adversaire sur un terrain de
-son élément attaque à ×1.25. Boss provisoires : départ sur le Dojo.
+son élément attaque à ×1.25. Les boss commencent sur le Dojo. Colonel Eclatax pose son propre terrain en cours de
+combat (le **Royaume du Colonel**, plante), au début de chacun de ses cycles : c'est un vrai changement de terrain
+(bonus de l'ancien retirés, trinkets prévenus), et une carte terrain jouée l'en fait sortir jusqu'à son retour.
 
 | Adversaire | Terrain | Élément | Malus pour le joueur |
 |---|---|---|---|
@@ -568,6 +572,7 @@ son élément attaque à ×1.25. Boss provisoires : départ sur le Dojo.
 | Hypercube misogyne | Cabinet psy scintillant | géométrique | adversaire +15 % dégâts |
 | Gobelin | Clairière d'adolescent de base | plante | −1 taille de main *(provisoire)* |
 | Engeance des cookies | Le canapé | neutre | aucun |
+| Colonel Eclatax (posé en combat) | Royaume du Colonel | plante | **soins ÷ 2** : tous les soins du joueur sont divisés par deux (cartes, objets, clopes, statuts, arrondi au PV le plus proche), le journal l'annonce |
 
 ## Choomies (monnaie)
 - **15 Choomies** au début de la partie. Gagnés à chaque victoire : commun 12-18, élite 30-40, boss 80-100
@@ -637,7 +642,7 @@ Reste : transitions d'écran ; vrais sons des statuts ; vrais sprites des person
 - Couleur de rareté et d'élément partout.
 
 ## Questions ouvertes
-- **[À DÉCIDER]** Nom et attaques du boss du niveau 3 (placeholder « Boss du niveau 3 »).
+- **[À DÉCIDER]** Cuite : la clope devrait-elle dessoûler **avant** de soigner (sinon, en Cuite au plafond de PV, ses +5 PV sont perdus) ? *Provisoire : elle soigne d'abord, comme avant.*
 - **[À DÉCIDER]** Noms des variantes de Choomah (provisoires : « Choomah pressé », « Choomah costaud »).
 - **[À DÉCIDER]** Nom du vendeur du shop et sa réplique d'accueil. Il a un sprite (ébauche : bonnet, barbe, clope au bec) et il fume.
 - **[À DÉCIDER]** Dave : son soin profite-t-il des bonus de soin (efficacité, Ross) ou est-il brut ? *Provisoire : il en profite.*
@@ -653,6 +658,7 @@ Reste : transitions d'écran ; vrais sons des statuts ; vrais sprites des person
 - **[À DÉCIDER]** CMS : « +50 % dégâts » = sorts seulement, ou aussi objets et trinkets ? *Provisoire : +50 % sur les dégâts élémentaires (sorts et Gaz du bat Inf), pas sur les dégâts bruts (Plan du campus, Pichet vide).*
 
 ### Tranchées
+- ~~Royaume du Colonel : clopes et soins gaspillés~~ → plus de blocage : sur le Royaume du Colonel, tous les soins du joueur (clopes comprises) sont divisés par deux ; un soin n'est donc jamais gaspillé.
 - ~~Plan V3 (stats)~~ → six stats (FOR, INT, ESP, DEF, RES, CHA) pour le joueur et les adversaires (section « Stats »). La RES s'applique aussi aux statuts « à coup sûr » ; critique ×1,5 ; +2 points de stats et +25 PV max après chaque boss ; Frederic BLC 2 partout ; adversaires +1 FOR et +1 DEF par niveau (pas les boss) ; sorts GLITCH : la meilleure stat offensive ; CMS inchangé pour l'instant ; Gaz du bat Inf sans GLITCH. Interprétations validées : coup adverse = (déclaré × niveau + FOR) × multiplicateurs × critique − DEF, minimum 1, coup par coup ; critique sur les sorts multipliés (et les coups adverses) ; dégâts élémentaires des objets sans stat ni critique ; rejeu = ×0,5 avant la DEF ; ESP sur les cartes et objets à PV fixes ; INT du joueur pour tous ses statuts ; boss sans scaling de stats ; Carte basique et Moindre carré comptent leur stat eux-mêmes ; Berceuse 2 × ESP sans ESP en plus ; Contre-exemple 1 + ⌊INT ÷ 3⌋ ; nouveaux objets communs ; touches C et A. Alien de Sassy : familier de 20 PV, 25 % des attaques le visent, assommé à 0 PV jusqu'au combat suivant, ni DEF ni statuts. Légendaires : cartes tirées selon leur rareté, poids des Légendaires et des secrets à 1. Cartes mortes hors de la taille de main.
 - ~~Qui bat qui des nouveaux éléments~~ → Géométrique > Algébrique > Spirituel > Géométrique, GLITCH bat tout (règle du code, `model.Element`).
 - ~~Prix des cartes au shop~~ → selon la rareté de la carte.

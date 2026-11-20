@@ -136,6 +136,9 @@ public final class HookDispatcher {
             case GameEvent.EnemyMissed e -> {
                 // Pas de hook pour l'instant.
             }
+            case GameEvent.SpellMissed e -> {
+                // Pas de hook pour l'instant.
+            }
             case GameEvent.DodgeReady e -> {
                 // Pas de hook pour l'instant.
             }
